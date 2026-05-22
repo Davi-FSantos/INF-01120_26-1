@@ -2,17 +2,23 @@
 set_xmakever("2.8.2")
 
 -- Define project and strict C++ standard
-set_project("MultiPlatformApp")
+set_project("Music_Machine")
 set_version("1.0.0")
 set_languages("cxx26")
+
+-- Make xmake output the file for clangd
+add_rules("plugin.compile_commands.autoupdate", {outputdir = "."})
 
 -- Enforce warnings as errors globally
 set_warnings("all", "error")
 
 -- Define the main executable target
-target("MultiPlatformApp")
+target("Music_Machine")
     set_kind("binary")
-    add_files("src/*.cpp")
+    add_files("sources/*.cpp")
+
+    -- Link the fluidsynth package
+    add_packages("fluidsynth")
 
     -- Separate binaries dynamically inside the bin directory
     set_targetdir("bin/$(os)_$(arch)_$(mode)")
