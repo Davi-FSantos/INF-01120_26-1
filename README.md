@@ -18,20 +18,33 @@ A `text ➜ MIDI` tracker. Since it's fun to listen to MIDI, we also support `te
 
 ## Prerequisites
 
-- **Build System**: CMake >= 3.25
+- **Build System**: XMake
 - **Dependencies**: 
   - **Qt6** (Core, Widgets)
   - **FluidSynth** 
+  - **TBD MIDI lib**
 
 ## Building the Project
 
+[TODO]
 
 ## Running Tests
 
 Unit tests will probably be managed through CTest?
 
-#
-
 ## Documentation
 
-- [TODO](nowhere)
+Inside [`docs`]() you'll find:
+```
+docs # This project's actual documentation
+├── spec # Pimenta's provided requirement files
+│   ├── Phase1.pdf
+│   ├── Phase2.pdf
+│   ├── Phase3.pdf
+│   ├── Test_suggestions.md
+│   └── Test_suggestions.pdf
+└── reports # Our reports
+    ├── Phase1.pdf
+    ├── Phase2.pdf
+    └── src # The source files for the reports
+```
