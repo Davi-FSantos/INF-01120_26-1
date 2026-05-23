@@ -416,3 +416,9 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# Project Specific
+compile_commands.json
+.xmake/*
+bin/*
+build/*
