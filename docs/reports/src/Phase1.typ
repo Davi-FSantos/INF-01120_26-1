@@ -1,9 +1,6 @@
-// #pdf.attach("main.typ", description: "Código fonte Typst deste documento")
-
 #set page(
   width: 21cm,
   height: auto,
-//   fill: rgb("#fdfdfd")
 )
 
 #v(1em)
@@ -117,7 +114,7 @@ O sistema deve:
 
 = Croqui da Interface com Usuário (GUI)
 
-#image("/images/croqui_phase1.png")
+#image("/images/croqui.png")
 
 = Arquitetura do Sistema
 
