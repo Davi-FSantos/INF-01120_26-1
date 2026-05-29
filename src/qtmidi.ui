@@ -1,0 +1,851 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QPushButton" name="pushButton">
+        <property name="text">
+         <string>&amp;Open</string>
+        </property>
+        <property name="icon">
+         <iconset theme="QIcon::ThemeIcon::DocumentOpen"/>
+        </property>
+        <property name="shortcut">
+         <string>Ctrl+O</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_2">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="text">
+         <string>&amp;Save</string>
+        </property>
+        <property name="icon">
+         <iconset theme="QIcon::ThemeIcon::DocumentSave"/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="spinBox">
+        <property name="suffix">
+         <string>% Volume</string>
+        </property>
+        <property name="maximum">
+         <number>100</number>
+        </property>
+        <property name="value">
+         <number>100</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_3">
+        <property name="text">
+         <string>Play</string>
+        </property>
+        <property name="icon">
+         <iconset theme="QIcon::ThemeIcon::MediaPlaybackStart"/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_4">
+        <property name="text">
+         <string>Reset</string>
+        </property>
+        <property name="icon">
+         <iconset theme="QIcon::ThemeIcon::MediaPlaybackStop"/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="comboBox">
+        <item>
+         <property name="text">
+          <string>Acoustic Grand Piano</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Bright Acoustic Piano</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Electric Grand Piano</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Honky-tonk Piano</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Electric Piano 1</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Electric Piano 2</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Harpsichord</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Clavinet</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Celesta</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Glockenspiel</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Music Box</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Vibraphone</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Marimba</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Xylophone</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Tubular Bells</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Dulcimer</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Drawbar Organ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Percussive Organ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Rock Organ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Church Organ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Reed Organ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Accordion</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Harmonica</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Tango Accordion</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Acoustic Guitar (nylon)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Acoustic Guitar (steel)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Electric Guitar (jazz)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Electric Guitar (clean)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Electric Guitar (muted)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Overdriven Guitar</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Distortion Guitar</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Guitar harmonics</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Acoustic Bass</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Electric Bass (finger)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Electric Bass (pick)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Fretless Bass</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Slap Bass 1</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Slap Bass 2</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Synth Bass 1</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Synth Bass 2</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Violin</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Viola</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Cello</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Contrabass</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Tremolo Strings</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Pizzicato Strings</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Orchestral Harp</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Timpani</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>String Ensemble 1</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>String Ensemble 2</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>SynthStrings 1</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>SynthStrings 2</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Choir Aahs</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Voice Oohs</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Synth Voice</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Orchestra Hit</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Trumpet</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Trombone</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Tuba</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Muted Trumpet</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>French Horn</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Brass Section</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>SynthBrass 1</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>SynthBrass 2</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Soprano Sax</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Alto Sax</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Tenor Sax</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Baritone Sax</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Oboe</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>English Horn</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Bassoon</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Clarinet</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Piccolo</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Flute</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Recorder</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Pan Flute</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Blown Bottle</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Shakuhachi</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Whistle</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Ocarina</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Lead 1 (square)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Lead 2 (sawtooth)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Lead 3 (calliope)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Lead 4 (chiff)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Lead 5 (charang)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Lead 6 (voice)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Lead 7 (fifths)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Lead 8 (bass + lead)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Pad 1 (new age)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Pad 2 (warm)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Pad 3 (polysynth)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Pad 4 (choir)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Pad 5 (bowed)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Pad 6 (metallic)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Pad 7 (halo)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Pad 8 (sweep)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>FX 1 (rain)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>FX 2 (soundtrack)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>FX 3 (crystal)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>FX 4 (atmosphere)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>FX 5 (brightness)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>FX 6 (goblins)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>FX 7 (echoes)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>FX 8 (sci-fi)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Sitar</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Banjo</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Shamisen</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Koto</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Kalimba</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Bag pipe</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Fiddle</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Shanai</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Tinkle Bell</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Agogo</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Steel Drums</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Woodblock</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Taiko Drum</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Melodic Tom</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Synth Drum</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Reverse Cymbal</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Guitar Fret Noise</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Breath Noise</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Seashore</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Bird Tweet</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Telephone Ring</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Helicopter</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Applause</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Gunshot</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="spinBox_2">
+        <property name="suffix">
+         <string> BPM</string>
+        </property>
+        <property name="prefix">
+         <string/>
+        </property>
+        <property name="minimum">
+         <number>40</number>
+        </property>
+        <property name="maximum">
+         <number>1200</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QPlainTextEdit" name="plainTextEdit"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_File">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <widget class="QMenu" name="menu_Export">
+     <property name="title">
+      <string>&amp;Export</string>
+     </property>
+     <addaction name="action_mid"/>
+     <addaction name="action_txt"/>
+    </widget>
+    <addaction name="actionOpen"/>
+    <addaction name="actionSave"/>
+    <addaction name="separator"/>
+    <addaction name="menu_Export"/>
+   </widget>
+   <widget class="QMenu" name="menuPlayback">
+    <property name="title">
+     <string>Playback</string>
+    </property>
+    <widget class="QMenu" name="menuChange_Instrument">
+     <property name="title">
+      <string>Change Instrument</string>
+     </property>
+     <addaction name="actionAcoustic_Grand_Piano"/>
+    </widget>
+    <addaction name="actionPlay"/>
+    <addaction name="actionPause"/>
+    <addaction name="separator"/>
+    <addaction name="actionReset"/>
+    <addaction name="separator"/>
+    <addaction name="menuChange_Instrument"/>
+    <addaction name="actionChange_BPM"/>
+   </widget>
+   <addaction name="menu_File"/>
+   <addaction name="menuPlayback"/>
+  </widget>
+  <action name="actionFile">
+   <property name="text">
+    <string>File</string>
+   </property>
+  </action>
+  <action name="actionOpen">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::DocumentOpen"/>
+   </property>
+   <property name="text">
+    <string>&amp;Open</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::DocumentSave"/>
+   </property>
+   <property name="text">
+    <string>&amp;Save</string>
+   </property>
+  </action>
+  <action name="action_mid">
+   <property name="text">
+    <string>.mid</string>
+   </property>
+  </action>
+  <action name="action_txt">
+   <property name="text">
+    <string>.txt</string>
+   </property>
+  </action>
+  <action name="actionPlay">
+   <property name="text">
+    <string>Play</string>
+   </property>
+  </action>
+  <action name="actionPause">
+   <property name="text">
+    <string>Pause</string>
+   </property>
+  </action>
+  <action name="actionReset">
+   <property name="text">
+    <string>Reset</string>
+   </property>
+  </action>
+  <action name="actionAcoustic_Grand_Piano">
+   <property name="text">
+    <string>Acoustic Grand Piano</string>
+   </property>
+  </action>
+  <action name="actionChange_BPM">
+   <property name="text">
+    <string>Change BPM</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
