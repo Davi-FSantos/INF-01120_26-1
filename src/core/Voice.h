@@ -13,6 +13,7 @@ public:
     void applyFugueDefaults(int index);
     void enqueueNote(int pitch);
     void enqueueEvent(MidiEvent event);
+    void emitBpmChange(int bpm);
 
     [[nodiscard]] std::optional<MidiEvent> getNextEvent();
     [[nodiscard]] bool hasEvents() const;
