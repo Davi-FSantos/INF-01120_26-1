@@ -7,7 +7,8 @@ enum class MidiEventType : uint8_t {
     NoteOn,
     NoteOff,
     ProgramChange,
-    VolumeChange
+    VolumeChange,
+    BpmChange
 };
 
 struct MidiEvent {

@@ -90,6 +90,15 @@ void Voice::enqueueEvent(MidiEvent event) {
     eventQueue_.push(event);
 }
 
+void Voice::emitBpmChange(int bpm) {
+    MidiEvent bpmEvent{};
+    bpmEvent.type = MidiEventType::BpmChange;
+    bpmEvent.value = bpm;
+    bpmEvent.timestamp = currentBeat + static_cast<double>(entryDelayBeats);
+    bpmEvent.channel = channel;
+    eventQueue_.push(bpmEvent);
+}
+
 std::optional<MidiEvent> Voice::getNextEvent() {
     if (eventQueue_.empty()) {
         return std::nullopt;
