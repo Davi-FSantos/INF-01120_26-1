@@ -6,6 +6,8 @@ set_project("Music_Machine")
 set_version("1.0.0")
 set_languages("cxx26")
 
+add_requires("fluidsynth")
+
 -- Make xmake output the file for clangd
 add_rules("plugin.compile_commands.autoupdate", {outputdir = "."})
 
@@ -22,6 +24,7 @@ target("Music_Machine")
     add_files("src/core/*.cpp")
     add_files("src/parsing/*.cpp")
     add_files("include/mainwindow.h")
+    add_files("src/audio/MidiPlayer.h")
     add_files("src/qtmidi.ui")
 
     add_includedirs("include", "src", ".")
