@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
+ <author>Julio Augusto de Castilhos Borges</author>
  <class>MusicMachine</class>
  <widget class="QMainWindow" name="MusicMachine">
   <property name="geometry">
@@ -51,6 +52,9 @@
       </item>
       <item>
        <widget class="QSpinBox" name="spinBox">
+        <property name="buttonSymbols">
+         <enum>QAbstractSpinBox::ButtonSymbols::PlusMinus</enum>
+        </property>
         <property name="suffix">
          <string>% Volume</string>
         </property>
@@ -728,6 +732,9 @@
       </item>
       <item>
        <widget class="QSpinBox" name="spinBox_2">
+        <property name="buttonSymbols">
+         <enum>QAbstractSpinBox::ButtonSymbols::UpDownArrows</enum>
+        </property>
         <property name="suffix">
          <string> BPM</string>
         </property>
@@ -739,6 +746,9 @@
         </property>
         <property name="maximum">
          <number>1200</number>
+        </property>
+        <property name="value">
+         <number>120</number>
         </property>
        </widget>
       </item>
@@ -779,23 +789,14 @@
    </widget>
    <widget class="QMenu" name="menuPlayback">
     <property name="title">
-     <string>Playback</string>
+     <string> &amp;Playback</string>
     </property>
-    <widget class="QMenu" name="menuChange_Instrument">
-     <property name="title">
-      <string>Change Instrument</string>
-     </property>
-     <property name="icon">
-      <iconset theme="QIcon::ThemeIcon::AudioCard"/>
-     </property>
-     <addaction name="actionAcoustic_Grand_Piano"/>
-    </widget>
     <addaction name="actionPlay"/>
     <addaction name="actionPause"/>
     <addaction name="separator"/>
     <addaction name="actionReset"/>
     <addaction name="separator"/>
-    <addaction name="menuChange_Instrument"/>
+    <addaction name="actionChange_Instrument"/>
     <addaction name="actionChange_BPM"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
@@ -867,7 +868,7 @@
     <iconset theme="QIcon::ThemeIcon::MediaPlaybackPause"/>
    </property>
    <property name="text">
-    <string>Pause</string>
+    <string>Pau&amp;se</string>
    </property>
   </action>
   <action name="actionReset">
@@ -875,12 +876,7 @@
     <iconset theme="QIcon::ThemeIcon::MediaPlaybackStop"/>
    </property>
    <property name="text">
-    <string>Reset</string>
-   </property>
-  </action>
-  <action name="actionAcoustic_Grand_Piano">
-   <property name="text">
-    <string>Acoustic Grand Piano</string>
+    <string>&amp;Reset</string>
    </property>
   </action>
   <action name="actionChange_BPM">
@@ -888,7 +884,7 @@
     <iconset theme="QIcon::ThemeIcon::SystemReboot"/>
    </property>
    <property name="text">
-    <string>Change BPM</string>
+    <string>Change &amp;BPM</string>
    </property>
   </action>
   <action name="actionUndo">
@@ -953,6 +949,14 @@
    </property>
    <property name="text">
     <string>About</string>
+   </property>
+  </action>
+  <action name="actionChange_Instrument">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::AudioCard"/>
+   </property>
+   <property name="text">
+    <string>Change &amp;Instrument</string>
    </property>
   </action>
  </widget>
