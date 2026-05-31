@@ -10,10 +10,12 @@ public:
     TextParser();
 
     std::vector<Voice> parse(const std::string& text, int initialBpm) override;
+    void setDefaultInstrument(int instrument);
 
 private:
     using Action = std::function<void(Voice&)>;
     std::unordered_map<char, Action> charRules_;
+    int defaultInstrument_{0};
 
     void buildRules();
     int parseDelay(const std::string& line, size_t& pos) const;

@@ -67,6 +67,9 @@ std::vector<Voice> TextParser::parse(const std::string& text, int initialBpm) {
         if (line.empty()) continue;
 
         Voice voice(voiceIndex);
+        if (voiceIndex == 0) {
+            voice.currentInstrument = defaultInstrument_;
+        }
         size_t pos = 0;
         voice.entryDelayBeats = parseDelay(line, pos);
 
@@ -231,4 +234,8 @@ void TextParser::buildRules() {
     charRules_['\n'] = [](Voice& v) {
         emitProgramChange(v, GM_SEASHORE);
     };
+}
+
+void TextParser::setDefaultInstrument(int instrument) {
+    defaultInstrument_ = instrument;
 }
