@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>MusicMachine</class>
+ <widget class="QMainWindow" name="MusicMachine">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,13 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Music Machine</string>
+  </property>
+  <property name="windowIcon">
+   <iconset theme="QIcon::ThemeIcon::AudioCard"/>
+  </property>
+  <property name="unifiedTitleAndToolBarOnMac">
+   <bool>false</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -760,6 +766,9 @@
      <property name="title">
       <string>&amp;Export</string>
      </property>
+     <property name="icon">
+      <iconset theme="QIcon::ThemeIcon::DocumentPageSetup"/>
+     </property>
      <addaction name="action_mid"/>
      <addaction name="action_txt"/>
     </widget>
@@ -776,6 +785,9 @@
      <property name="title">
       <string>Change Instrument</string>
      </property>
+     <property name="icon">
+      <iconset theme="QIcon::ThemeIcon::AudioCard"/>
+     </property>
      <addaction name="actionAcoustic_Grand_Piano"/>
     </widget>
     <addaction name="actionPlay"/>
@@ -786,8 +798,30 @@
     <addaction name="menuChange_Instrument"/>
     <addaction name="actionChange_BPM"/>
    </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>&amp;Edit</string>
+    </property>
+    <addaction name="actionUndo"/>
+    <addaction name="actionRedo"/>
+    <addaction name="separator"/>
+    <addaction name="actionCut"/>
+    <addaction name="actionCopy"/>
+    <addaction name="actionPaste"/>
+    <addaction name="actionDelete"/>
+    <addaction name="separator"/>
+    <addaction name="actionSelect_All"/>
+   </widget>
+   <widget class="QMenu" name="menu_Help">
+    <property name="title">
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="actionAbout"/>
+   </widget>
    <addaction name="menu_File"/>
+   <addaction name="menuEdit"/>
    <addaction name="menuPlayback"/>
+   <addaction name="menu_Help"/>
   </widget>
   <action name="actionFile">
    <property name="text">
@@ -821,16 +855,25 @@
    </property>
   </action>
   <action name="actionPlay">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::MediaPlaybackStart"/>
+   </property>
    <property name="text">
     <string>Play</string>
    </property>
   </action>
   <action name="actionPause">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::MediaPlaybackPause"/>
+   </property>
    <property name="text">
     <string>Pause</string>
    </property>
   </action>
   <action name="actionReset">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::MediaPlaybackStop"/>
+   </property>
    <property name="text">
     <string>Reset</string>
    </property>
@@ -841,8 +884,75 @@
    </property>
   </action>
   <action name="actionChange_BPM">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::SystemReboot"/>
+   </property>
    <property name="text">
     <string>Change BPM</string>
+   </property>
+  </action>
+  <action name="actionUndo">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::EditUndo"/>
+   </property>
+   <property name="text">
+    <string>&amp;Undo</string>
+   </property>
+  </action>
+  <action name="actionRedo">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::EditRedo"/>
+   </property>
+   <property name="text">
+    <string>&amp;Redo</string>
+   </property>
+  </action>
+  <action name="actionCut">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::EditCut"/>
+   </property>
+   <property name="text">
+    <string>Cut</string>
+   </property>
+  </action>
+  <action name="actionCopy">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::EditCopy"/>
+   </property>
+   <property name="text">
+    <string>&amp;Copy</string>
+   </property>
+  </action>
+  <action name="actionPaste">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::EditPaste"/>
+   </property>
+   <property name="text">
+    <string>Paste</string>
+   </property>
+  </action>
+  <action name="actionDelete">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::EditDelete"/>
+   </property>
+   <property name="text">
+    <string>&amp;Delete</string>
+   </property>
+  </action>
+  <action name="actionSelect_All">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::EditSelectAll"/>
+   </property>
+   <property name="text">
+    <string>Select &amp;All</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::HelpAbout"/>
+   </property>
+   <property name="text">
+    <string>About</string>
    </property>
   </action>
  </widget>

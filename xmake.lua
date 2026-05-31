@@ -15,7 +15,16 @@ set_warnings("all", "error")
 -- Define the main executable target
 target("Music_Machine")
     set_kind("binary")
-    add_files("sources/*.cpp")
+    add_rules("qt.widgetapp")
+
+    add_files("src/*.cpp")
+    add_files("src/audio/*.cpp")
+    add_files("src/core/*.cpp")
+    add_files("src/parsing/*.cpp")
+    add_files("include/mainwindow.h")
+    add_files("src/qtmidi.ui")
+
+    add_includedirs("include", "src", ".")
 
     -- Link the fluidsynth package
     add_packages("fluidsynth")
