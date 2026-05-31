@@ -1,0 +1,58 @@
+#include "AudioEngine.h"
+#include <stdexcept>
+
+AudioEngine::AudioEngine()
+    : settings_(nullptr),
+      synth_(nullptr),
+      adriver_(nullptr),
+      soundfontId_(-1),
+      isPlaying_(false) {
+}
+
+AudioEngine::~AudioEngine() {
+    shutdown();
+}
+
+bool AudioEngine::initialize(std::string sfPath) {
+    settings_ = new_fluid_settings();
+    if (!settings_) return false;
+
+    synth_ = new_fluid_synth(settings_);
+    if (!synth_) return false;
+
+    adriver_ = new_fluid_audio_driver(settings_, synth_);
+    if (!adriver_) return false;
+
+    soundfontId_ = fluid_synth_sfload(synth_, sfPath.c_str(), 1);
+    if (soundfontId_ == FLUID_FAILED) return false;
+
+    return true;
+}
+void AudioEngine::noteOn(int channel, int key, int velocity) {
+    fluid_synth_noteon(synth_, channel, key, velocity);
+}
+void AudioEngine::programChange(int channel, int program) {
+    fluid_synth_program_change(synth_, channel, program);
+}
+void AudioEngine::noteOff(int channel, int key) {
+    fluid_synth_noteoff(synth_, channel, key);
+}
+void AudioEngine::setChannelVolume(int channel, int volume) {
+    fluid_synth_cc(synth_, channel, 7, volume);
+}
+void AudioEngine::shutdown() {
+    if (adriver_) {
+        delete_fluid_audio_driver(adriver_);
+        adriver_ = nullptr;
+    }
+    if (synth_) {
+        delete_fluid_synth(synth_);
+        synth_ = nullptr;
+    }
+    if (settings_) {
+        delete_fluid_settings(settings_);
+        settings_ = nullptr;
+    }
+    soundfontId_ = -1;
+    isPlaying_ = false;
+}
