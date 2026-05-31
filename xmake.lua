@@ -25,7 +25,9 @@ target("Music_Machine")
     add_files("src/parsing/*.cpp")
     add_files("include/mainwindow.h")
     add_files("src/audio/MidiPlayer.h")
+    add_files("src/aboutdialog.h")
     add_files("src/qtmidi.ui")
+    add_files("src/aboutdialog.ui")
 
     add_includedirs("include", "src", ".")
 
