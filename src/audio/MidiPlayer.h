@@ -6,6 +6,8 @@
 #include <atomic>
 #include <vector>
 #include <mutex>
+#include <set>
+#include <utility>
 #include "src/core/Voice.h"
 #include "src/audio/IAudioOutput.h"
 
@@ -46,6 +48,7 @@ private:
     std::atomic<int> masterVolume_{100};
     std::vector<PlaybackEvent> playbackEvents_;
     int initialBpm_{120};
+    std::set<std::pair<int, int>> activeNotes_;
     mutable std::mutex stateMutex_;
 
 public:
