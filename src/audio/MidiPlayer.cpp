@@ -80,6 +80,12 @@ void MidiPlayer::pause() {
     std::lock_guard<std::mutex> lock(stateMutex_);
     if (isPlaying_ && !isPaused_) {
         isPaused_ = true;
+        if (audioOutput_) {
+            for (const auto& note : activeNotes_) {
+                audioOutput_->noteOff(note.first, note.second);
+            }
+        }
+        activeNotes_.clear();
     }
 }
 
@@ -97,6 +103,12 @@ void MidiPlayer::stop() {
         wasPlaying = isPlaying_;
         isPlaying_ = false;
         isPaused_ = false;
+        if (audioOutput_) {
+            for (const auto& note : activeNotes_) {
+                audioOutput_->noteOff(note.first, note.second);
+            }
+        }
+        activeNotes_.clear();
     }
     if (playbackThread_.joinable()) {
         playbackThread_.join();
@@ -159,26 +171,38 @@ void MidiPlayer::playbackLoop() {
 
 void MidiPlayer::dispatch(const MidiEvent& event) {
     if (!audioOutput_) return;
-    switch (event.type) {
-        case MidiEventType::NoteOn: {
-            int scaledVel = (event.velocity * masterVolume_.load()) / MAX_VOLUME_PERCENT;
-            audioOutput_->noteOn(event.channel, event.pitch, scaledVel);
-            break;
+    
+    // Concurrency protection for activeNotes_ access and to block events after pause/stop
+    if (event.type == MidiEventType::NoteOn) {
+        std::lock_guard<std::mutex> lock(stateMutex_);
+        if (!isPlaying_ || isPaused_) return;
+        
+        int scaledVel = (event.velocity * masterVolume_.load()) / MAX_VOLUME_PERCENT;
+        audioOutput_->noteOn(event.channel, event.pitch, scaledVel);
+        if (scaledVel > 0) {
+            activeNotes_.insert({event.channel, event.pitch});
+        } else {
+            activeNotes_.erase({event.channel, event.pitch});
         }
-        case MidiEventType::NoteOff:
-            audioOutput_->noteOff(event.channel, event.pitch);
-            break;
-        case MidiEventType::ProgramChange:
-            audioOutput_->programChange(event.channel, event.value);
-            break;
-        case MidiEventType::VolumeChange: {
-            int scaledVol = (event.value * masterVolume_.load()) / MAX_VOLUME_PERCENT;
-            audioOutput_->setChannelVolume(event.channel, scaledVol);
-            break;
+    }
+    else if (event.type == MidiEventType::NoteOff) {
+        std::lock_guard<std::mutex> lock(stateMutex_);
+        audioOutput_->noteOff(event.channel, event.pitch);
+        activeNotes_.erase({event.channel, event.pitch});
+    }
+    else {
+        switch (event.type) {
+            case MidiEventType::ProgramChange:
+                audioOutput_->programChange(event.channel, event.value);
+                break;
+            case MidiEventType::VolumeChange: {
+                int scaledVol = (event.value * masterVolume_.load()) / MAX_VOLUME_PERCENT;
+                audioOutput_->setChannelVolume(event.channel, scaledVol);
+                break;
+            }
+            default:
+                break;
         }
-        case MidiEventType::BpmChange:
-            // Handled pre-playback in timing calculations
-            break;
     }
 }
 
