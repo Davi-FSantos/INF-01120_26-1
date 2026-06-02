@@ -37,6 +37,10 @@ target("Music_Machine")
     add_packages("fluidsynth")
     add_packages("libremidi")
 
+    if is_plat("windows") then
+        add_defines("_CRT_SECURE_NO_WARNINGS")
+    end
+
     -- Separate binaries dynamically inside the bin directory
     set_targetdir("bin/$(os)_$(arch)_$(mode)")
 

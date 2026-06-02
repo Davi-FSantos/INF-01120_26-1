@@ -422,3 +422,4 @@ compile_commands.json
 .xmake/*
 bin/*
 build/*
+*.7z
