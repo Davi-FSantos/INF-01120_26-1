@@ -127,7 +127,8 @@ O sistema deve:
 == Classe MidiWriter
 
 *Atributos:*
-- `midiFile: smf::MidiFile` - Instância de controle de escrita de arquivos MIDI polifônicos
+- `writer_: libremidi::writer` - Instância de controle de escrita de arquivos MIDI polifônicos
+- `TICKS_PER_BEAT: int` - Resolução de tempo (constante, padrão 480 ticks/beat)
 
 *Métodos:*
 - `createFile(): void` - Inicializa as estruturas necessárias para o arquivo MIDI multi-track
@@ -172,3 +173,42 @@ O sistema é estruturado em uma arquitetura modular orientada a objetos projetad
 - *Camada de Síntese e Driver de Áudio*: A classe `AudioEngine` isola a biblioteca externa FluidSynth do restante da lógica da aplicação. Ela realiza a inicialização assíncrona dos buffers, carregamento da SoundFont e despacho de eventos MIDI brutos em canais mapeados para cada voz do sistema. Isso permite que a biblioteca de áudio ou sintetizador físico seja substituído no futuro por outra tecnologia compatível sem que a lógica central da aplicação precise ser reescrita (atendendo ao princípio de Inversão de Dependência).
 
 - *Camada de Exportação*: A classe `MidiWriter` encapsula o empacotamento em formato de trilhas de arquivo MIDI padrão, gravando em disco o resultado estático da interpretação musical.
+
+- *Refinamentos de Implementação*: Durante o desenvolvimento do código-fonte, a classe conceitual `MusicMachine` descrita na modelagem foi refinada em `MidiPlayer` (responsável exclusiva pela gerência da thread assíncrona de reprodução e controle refinado de tempo) e em `MainWindow` (gerenciando a janela gráfica e os slots de interação), garantindo maior coesão de acordo com o Princípio de Responsabilidade Única (SRP). Adicionalmente, o componente de análise conceitual `TokenProcessor` foi implementado como a classe `TextParser`, a qual implementa a interface extensível `ITextParser` (promovendo desacoplamento e facilitando a substituição de regras sem alterar as classes consumidoras, em conformidade com o Princípio Aberto/Fechado - OCP).
+
+= Suposições de Projeto
+
+Para o correto funcionamento do sistema e delimitação do escopo técnico na Fase 2, foram estabelecidas as seguintes suposições de projeto:
+
+1. *Disponibilidade de SoundFonts*: O motor de síntese FluidSynth exige um arquivo de SoundFont (`.sf2` ou `.sf3`) General MIDI para gerar áudio analógico. Assume-se que o ambiente operacional possui caminhos comuns de bibliotecas de áudio populados (como `/usr/share/sounds/sf2/FluidR3_GM.sf2` no Linux). Como contingência, o sistema provê um diálogo interativo de seleção de arquivos (`QFileDialog`) caso nenhuma SoundFont padrão seja encontrada automaticamente, permitindo ao usuário indicar o caminho do arquivo manualmente.
+2. *Reserva do Canal MIDI 9*: Por especificação do protocolo General MIDI, o canal 10 (indexado como 9) é estritamente dedicado a instrumentos de percussão (bateria). Para evitar timbres ruidosos e incoerentes ao enviar notas e programações melódicas para esse canal, o sistema assume que o canal 9 deve ser explicitamente ignorado durante o mapeamento de notas melódicas e alterações gerais de timbres.
+3. *Tratamento de Andamento Global*: Supõe-se que as instruções de aceleração (`>`) e desaceleração (`<`) possuem escopo global. Elas afetam a taxa de tempo (BPM) compartilhada por todas as vozes concorrentes em tempo de execução, mudando a duração física de cada pulso em tempo real sem alterar a contagem lógica do atraso inicial de cada voz. O andamento mínimo é travado em 40 BPM para impedir erros de divisão por zero ou congelamento temporal do sequenciador.
+4. *Escopo de Parâmetros Locais*: Volume, oitava (`?`/`V`/`.`) e instrumento são considerados locais de cada voz e processados individualmente em canais MIDI separados, garantindo que a execução polifônica preserve as dinâmicas particulares de cada linha textual.
+
+= Justificativa da Interface Gráfica (GUI)
+
+O design visual da interface gráfica foi elaborado sob a premissa de simplicidade operacional, ergonomia e fácil experimentação por parte do usuário. As decisões de layout justificam-se conforme os seguintes pontos:
+
+1. *Área de Edição Textual Livre*: O componente principal é um editor de texto amplo (`QTextEdit`), simulando uma partitura digital onde cada linha do texto corresponde diretamente a uma voz da fuga. O usuário tem liberdade de edição, permitindo copiar, colar e modificar facilmente trechos musicais.
+2. *Barra de Parâmetros Iniciais*: Posicionada no topo da interface, permite configurar o andamento inicial (BPM) via seletor numérico (`QSpinBox`), selecionar o timbre padrão da voz principal (`QComboBox`) e controlar o volume geral via seletor deslizante (`QSlider`). Isso centraliza as configurações da reprodução em um local visível e de fácil acesso.
+3. *Controles de Reprodução Intuitivos (Play/Pause/Stop)*: Posicionados de forma adjacente, os botões oferecem controle imediato sobre o áudio. O botão Play ativa a reprodução assíncrona, alternando seu estado visual para Pause para pausar temporariamente. O botão Stop interrompe a execução, resetando os ponteiros de eventos e forçando o silenciamento imediato de todas as notas ativas nas vozes para sanar problemas de "notas presas" (hanging notes).
+4. *Diálogo de Informações (About)*: Um diálogo dedicado (`AboutDialog`) foi projetado via Qt Designer e pode ser aberto a partir do menu "Help > About". Esta janela apresenta detalhes da versão do sistema, dos integrantes do grupo de desenvolvimento e inclui um botão interativo conectado a `QDesktopServices::openUrl()` que abre o repositório oficial no navegador padrão do sistema operacional, facilitando o acesso ao código de maneira elegante.
+5. *Atalhos do Teclado*: O menu superior "Playback" expõe as opções de controle e foca nos respectivos seletores de andamento e instrumentos ao serem selecionados, otimizando o fluxo de trabalho do usuário avançado.
+
+= Descrição do Procedimento de Teste
+
+A validação de corretude do sistema e do motor de áudio assíncrono abrangeu tanto testes unitários e arquivos de testes estruturados quanto testes de verificação manual do comportamento da interface e concorrência:
+
+== Casos de Teste Automatizados e Estruturados
+O diretório `tests/` concentra arquivos de texto simples que validam cenários específicos de interpretação semântica e processamento de tokens. O parser realiza a extração e o enfileiramento correspondentes:
+1. *Fuga BWV 847 (`tests/fuga_bwv847.txt`)* e *Fuga BWV 578 (`tests/fuga_bwv578.txt`)*: Validação do processamento polifônico complexo, garantindo que múltiplas vozes com atrasos de entrada (`[n]`) rodem concorrentemente sem falhas de sincronia.
+2. *Fuga BPM (`tests/fuga_bpm.txt`)*: Testa o processamento dos modificadores globais de andamento (`>` e `<`), garantindo que o BPM do sequenciador seja acelerado e desacelerado de forma homogênea para todas as trilhas ativas.
+3. *Fuga Instrumentos (`tests/fuga_instrumentos.txt`)*: Valida se modificadores como dígitos e caracteres especiais (`!`, `;`, `,`, vogais) resultam nas corretas trocas de canais de instrumentos do sintetizador FluidSynth.
+4. *Fuga Pausas (`tests/fuga_pausas.txt`)*: Valida o comportamento de silenciamento temporário introduzido por caracteres minúsculos (`a-h`) e outras consoantes.
+5. *Fuga Oitavas (`tests/fuga_oitavas.txt`)*: Confirma que os comandos `?`, `V` e `.` alteram as oitavas locais nos limites definidos (0 a 9) e que o estouro superior reinicia à oitava de partida.
+6. *Fuga Repetidas (`tests/fuga_repetidas.txt`)*: Valida a semântica de repetição de nota ao encontrar consoantes ou caracteres não mapeados logo após uma nota válida.
+
+== Verificação Manual de Concorrência e Estabilidade
+- *Teste de Responsividade*: Durante a reprodução contínua de peças polifônicas complexas, o usuário realiza operações na janela principal (digitação de novos textos, redimensionamento de janelas e clique em menus). A interface gráfica mantém-se totalmente fluida e responsiva a 60 FPS, demonstrando que a thread assíncrona secundária isola o processamento pesado de áudio sem congelar o loop principal de eventos do Qt.
+- *Teste de Notas Presas (Hanging Notes)*: Com a música tocando no meio de passagens com notas de longa sustentação, o usuário pressiona "Stop" ou "Pause". Confirma-se visualmente e auditivamente que todas as notas são silenciadas no mesmo milissegundo, validando o gerenciamento thread-safe do vetor de notas ativas do `MidiPlayer`.
+- *Teste de Fallback de SoundFont*: Ao inicializar o executável em uma máquina sem fontes do sintetizador de áudio, confirma-se o surgimento de uma caixa de aviso indicando a ausência do SoundFont, seguida pelo seletor de arquivos local `QFileDialog`. Ao escolher uma SoundFont externa, a síntese de áudio é restabelecida imediatamente.
