@@ -7,6 +7,7 @@ set_version("1.0.0")
 set_languages("cxx26")
 
 add_requires("fluidsynth")
+add_requires("libremidi")
 
 -- Make xmake output the file for clangd
 add_rules("plugin.compile_commands.autoupdate", {outputdir = "."})
@@ -25,6 +26,7 @@ target("Music_Machine")
     add_files("src/parsing/*.cpp")
     add_files("include/mainwindow.h")
     add_files("src/audio/MidiPlayer.h")
+    add_files("src/audio/MidiWriter.h")
     add_files("src/aboutdialog.h")
     add_files("src/qtmidi.ui")
     add_files("src/aboutdialog.ui")
@@ -33,6 +35,7 @@ target("Music_Machine")
 
     -- Link the fluidsynth package
     add_packages("fluidsynth")
+    add_packages("libremidi")
 
     -- Separate binaries dynamically inside the bin directory
     set_targetdir("bin/$(os)_$(arch)_$(mode)")

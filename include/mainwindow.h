@@ -23,6 +23,7 @@ private slots:
     void onResetClicked();
     void onOpenClicked();
     void onSaveClicked();
+    void onExportMidiClicked();
     void onAboutTriggered();
     void onPlaybackFinished();
     void onPlaybackStarted();
