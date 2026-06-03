@@ -9,6 +9,10 @@ set_languages("cxx26")
 add_requires("fluidsynth")
 add_requires("libremidi")
 
+if is_mode("debug") then
+    add_requires("doctest")
+end
+
 -- Make xmake output the file for clangd
 add_rules("plugin.compile_commands.autoupdate", {outputdir = "."})
 
@@ -63,12 +67,31 @@ target("Music_Machine")
         
         -- Address and Undefined Behavior Sanitizers
         if is_plat("linux", "macosx", "freebsd") then
-            add_cxflags("-fsanitize=address,undefined", "-fno-omit-frame-pointer")
+            add_cxflags("-fsanitize=address,undefined", "-fno-omit-frame-pointer", "-fno-contracts")
             add_ldflags("-fsanitize=address,undefined")
         elseif is_plat("windows") then
             add_cxflags("/fsanitize=address")
         end
     end
+
+-- Debug-only test runner target and dependencies
+if is_mode("debug") then
+    target("test_runner")
+        set_kind("binary")
+        set_default(false) -- Don't compile by default with 'xmake'
+        add_files("tests/test_backend.cpp")
+        add_files("src/core/Voice.cpp")
+        add_files("src/parsing/TextParser.cpp")
+        add_includedirs("include", "src", ".")
+        add_packages("doctest")
+
+        if is_plat("linux", "macosx", "freebsd") then
+            add_cxflags("-fsanitize=address,undefined", "-fno-omit-frame-pointer", "-fno-contracts")
+            add_ldflags("-fsanitize=address,undefined")
+        elseif is_plat("windows") then
+            add_cxflags("/fsanitize=address")
+        end
+end
 
 -- Custom Task: Build all platforms and architectures in Release mode
 task("build_all_release")

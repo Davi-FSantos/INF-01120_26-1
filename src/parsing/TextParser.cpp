@@ -34,7 +34,7 @@ namespace {
         MidiEvent pc{};
         pc.type = MidiEventType::ProgramChange;
         pc.value = instrument;
-        pc.timestamp = voice.currentBeat + static_cast<double>(voice.entryDelayBeats);
+        pc.timestamp = voice.currentBeat;
         voice.enqueueEvent(pc);
     }
 
@@ -42,7 +42,7 @@ namespace {
         MidiEvent vc{};
         vc.type = MidiEventType::VolumeChange;
         vc.value = voice.currentVolume;
-        vc.timestamp = voice.currentBeat + static_cast<double>(voice.entryDelayBeats);
+        vc.timestamp = voice.currentBeat;
         voice.enqueueEvent(vc);
     }
 
@@ -77,7 +77,7 @@ std::vector<Voice> TextParser::parse(const std::string& text, int initialBpm) {
         MidiEvent programChange{};
         programChange.type = MidiEventType::ProgramChange;
         programChange.value = voice.currentInstrument;
-        programChange.timestamp = static_cast<double>(voice.entryDelayBeats);
+        programChange.timestamp = 0.0;
         voice.enqueueEvent(programChange);
 
         for (; pos < line.size(); ++pos) {
