@@ -67,7 +67,7 @@ target("Music_Machine")
         
         -- Address and Undefined Behavior Sanitizers
         if is_plat("linux", "macosx", "freebsd") then
-            add_cxflags("-fsanitize=address,undefined", "-fno-omit-frame-pointer", "-fno-contracts")
+            add_cxflags("-fsanitize=address,undefined", "-fno-omit-frame-pointer")
             add_ldflags("-fsanitize=address,undefined")
         elseif is_plat("windows") then
             add_cxflags("/fsanitize=address")
@@ -82,11 +82,12 @@ if is_mode("debug") then
         add_files("tests/test_backend.cpp")
         add_files("src/core/Voice.cpp")
         add_files("src/parsing/TextParser.cpp")
+        add_files("src/contracts_handler.cpp")
         add_includedirs("include", "src", ".")
         add_packages("doctest")
 
         if is_plat("linux", "macosx", "freebsd") then
-            add_cxflags("-fsanitize=address,undefined", "-fno-omit-frame-pointer", "-fno-contracts")
+            add_cxflags("-fsanitize=address,undefined", "-fno-omit-frame-pointer")
             add_ldflags("-fsanitize=address,undefined")
         elseif is_plat("windows") then
             add_cxflags("/fsanitize=address")
