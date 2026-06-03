@@ -12,6 +12,7 @@ namespace {
     constexpr int DEFAULT_OCTAVE = 6;
 
     constexpr int GM_BANDONEON = 24;
+    constexpr int GM_HARMONICA = 22;
     constexpr int GM_TUBULAR_BELLS = 15;
     constexpr int GM_CHURCH_ORGAN = 20;
     constexpr int GM_SEASHORE = 122;
@@ -82,6 +83,16 @@ std::vector<Voice> TextParser::parse(const std::string& text, int initialBpm) {
 
         for (; pos < line.size(); ++pos) {
             char c = line[pos];
+
+            // Check for multi-character tokens: Eb, Ab, Mb
+            if ((c == 'E' || c == 'A' || c == 'M') && pos + 1 < line.size() && line[pos+1] == 'b') {
+                std::string noteStr;
+                noteStr.push_back(c);
+                noteStr.push_back('b');
+                voice.enqueueNote(Voice::noteToMidiPitch(noteStr, voice.currentOctave));
+                ++pos; // skip 'b'
+                continue;
+            }
 
             // > and < modify BPM globally — handled inline because
             // they need access to the cumulative currentBpm counter
@@ -194,9 +205,9 @@ void TextParser::buildRules() {
         emitVolumeChange(v);
     };
 
-    // ! : Bandoneon (GM 24)
+    // ! : Harmonica (GM 22)
     charRules_['!'] = [](Voice& v) {
-        emitProgramChange(v, GM_BANDONEON);
+        emitProgramChange(v, GM_HARMONICA);
     };
 
     // ? : increase octave; if already max, reset to default

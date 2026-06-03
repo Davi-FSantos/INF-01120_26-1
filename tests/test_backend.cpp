@@ -80,6 +80,12 @@ TEST_CASE("Voice noteToMidiPitch") {
     CHECK(Voice::noteToMidiPitch('C', -2) == 0); // (-2+1)*12 + 0 = -12 -> clamped to 0
     // Maximum pitch clamping: H at octave 9 is (9+1)*12 + 10 = 130 -> clamped to 127
     CHECK(Voice::noteToMidiPitch('H', 9) == 127);
+
+    // String overload tests
+    CHECK(Voice::noteToMidiPitch(std::string("A"), 4) == 69);
+    CHECK(Voice::noteToMidiPitch(std::string("Eb"), 4) == 63); // (4+1)*12 + 3 = 63
+    CHECK(Voice::noteToMidiPitch(std::string("Mb"), 4) == 63); // (4+1)*12 + 3 = 63
+    CHECK(Voice::noteToMidiPitch(std::string("Ab"), 4) == 68); // (4+1)*12 + 8 = 68
 }
 
 TEST_CASE("TextParser - Notes and ProgramChange Events") {
@@ -162,10 +168,10 @@ TEST_CASE("TextParser - Instrument Mappings") {
     SUBCASE("Exclamation Mark !") {
         auto voices = parser.parse("!", 120);
         auto events = getEvents(voices[0]);
-        // PC(0) at 0, PC(24) at 0
+        // PC(0) at 0, PC(22) at 0
         REQUIRE(events.size() == 2);
         CHECK(events[1].type == MidiEventType::ProgramChange);
-        CHECK(events[1].value == 24); // Bandoneon
+        CHECK(events[1].value == 22); // Harmonica
     }
 
     SUBCASE("Vowels O, o, I, i, U, u") {
@@ -325,4 +331,35 @@ TEST_CASE("TextParser - Global BPM Control") {
     CHECK(events[4].type == MidiEventType::BpmChange);
     CHECK(events[4].value == 120);
     CHECK(events[4].timestamp == 1.0);
+}
+
+TEST_CASE("TextParser - Flat Notes (Eb, Ab, Mb)") {
+    TextParser parser;
+    auto voices = parser.parse("Eb Ab Mb", 120);
+    REQUIRE(voices.size() == 1);
+    auto events = getEvents(voices[0]);
+
+    // Events:
+    // 0: ProgramChange
+    // 1: NoteOn Eb (pitch 87, volume 100) at 0.0 (V0 octave 6 -> (6+1)*12 + 3 = 87)
+    // 2: NoteOff Eb at 1.0
+    // 3: VolumeChange (volume doubled by space) at 1.0
+    // 4: NoteOn Ab (pitch 92) at 1.0 (V0 octave 6 -> (6+1)*12 + 8 = 92)
+    // 5: NoteOff Ab at 2.0
+    // 6: VolumeChange (volume doubled by space) at 2.0
+    // 7: NoteOn Mb (pitch 87) at 2.0
+    // 8: NoteOff Mb at 3.0
+    REQUIRE(events.size() == 9);
+    
+    CHECK(events[1].type == MidiEventType::NoteOn);
+    CHECK(events[1].pitch == 87);
+    CHECK(events[1].timestamp == 0.0);
+
+    CHECK(events[4].type == MidiEventType::NoteOn);
+    CHECK(events[4].pitch == 92);
+    CHECK(events[4].timestamp == 1.0);
+
+    CHECK(events[7].type == MidiEventType::NoteOn);
+    CHECK(events[7].pitch == 87);
+    CHECK(events[7].timestamp == 2.0);
 }

@@ -1,6 +1,7 @@
 #include "src/core/Voice.h"
 #include <algorithm>
 #include <cmath>
+#include <string>
 
 namespace {
     constexpr int GM_INSTRUMENTS[] = {0, 20, 6, 71};
@@ -55,6 +56,21 @@ int Voice::noteToMidiPitch(char noteName, int octave) {
 
     int pitch = (octave + 1) * MIDI_OCTAVE_BASE + semitones[idx];
     return std::clamp(pitch, MIN_MIDI_PITCH, MAX_MIDI_PITCH);
+}
+
+int Voice::noteToMidiPitch(const std::string& noteName, int octave) {
+    if (noteName.size() == 1) {
+        return noteToMidiPitch(noteName[0], octave);
+    }
+    if (noteName == "Eb" || noteName == "Mb") {
+        int pitch = (octave + 1) * MIDI_OCTAVE_BASE + 3;
+        return std::clamp(pitch, MIN_MIDI_PITCH, MAX_MIDI_PITCH);
+    }
+    if (noteName == "Ab") {
+        int pitch = (octave + 1) * MIDI_OCTAVE_BASE + 8;
+        return std::clamp(pitch, MIN_MIDI_PITCH, MAX_MIDI_PITCH);
+    }
+    return -1;
 }
 
 void Voice::enqueueNote(int pitch) {

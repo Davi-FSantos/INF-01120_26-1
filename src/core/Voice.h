@@ -34,6 +34,7 @@ public:
     static constexpr int MIDI_C4 = 60;
 
     static int noteToMidiPitch(char noteName, int octave);
+    static int noteToMidiPitch(const std::string& noteName, int octave);
 
 private:
     std::queue<MidiEvent> eventQueue_;
