@@ -160,3 +160,25 @@ task("build_all_release")
         end
     end
     )
+
+-- Custom Task: Format all source code
+task("format")
+    set_menu({
+        usage = "xmake format",
+        description = "Runs clang-format over all source and header C++ files."
+    })
+    on_run(function ()
+        os.exec("clang-format -i src/*.cpp src/audio/*.cpp src/core/*.cpp src/parsing/*.cpp include/*.h src/*.h tests/*.cpp")
+        print("Codebase formatted successfully!")
+    end)
+
+-- Custom Task: Lint all source code
+task("lint")
+    set_menu({
+        usage = "xmake lint",
+        description = "Runs static analysis using clang-tidy and run_linter.sh."
+    })
+    on_run(function ()
+        os.exec("./run_linter.sh")
+    end)
+

@@ -1,0 +1,7 @@
+# Clang-Tidy Configuration File
+# Enforces code quality, modern C++ guidelines, performance, and bug prevention.
+
+Checks: '-*,bugprone-*,modernize-*,performance-*,readability-*,-readability-magic-numbers,-readability-identifier-length,-readability-implicit-bool-conversion,-readability-convert-member-functions-to-static,-modernize-use-trailing-return-type'
+WarningsAsErrors: ''
+HeaderFilterRegex: 'INF-01120_26-1/(src|include|tests)/'
+FormatStyle: file

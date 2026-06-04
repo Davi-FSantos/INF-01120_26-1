@@ -2,15 +2,14 @@
 #include <algorithm>
 #include <chrono>
 
-MidiPlayer::MidiPlayer(QObject* parent)
-    : QObject(parent), audioOutput_(nullptr) {
+MidiPlayer::MidiPlayer(QObject *parent) : QObject(parent) {
 }
 
 MidiPlayer::~MidiPlayer() {
     stop();
 }
 
-void MidiPlayer::initialize(IAudioOutput* audioOutput) {
+void MidiPlayer::initialize(IAudioOutput *audioOutput) {
     audioOutput_ = audioOutput;
 }
 
@@ -19,7 +18,7 @@ void MidiPlayer::play(std::vector<Voice> voices, int initialBpm) {
 
     // Flatten and collect all events from voices
     std::vector<MidiEvent> allEvents;
-    for (auto& voice : voices) {
+    for (auto &voice : voices) {
         while (voice.hasEvents()) {
             if (auto eventOpt = voice.getNextEvent()) {
                 allEvents.push_back(*eventOpt);
@@ -28,19 +27,25 @@ void MidiPlayer::play(std::vector<Voice> voices, int initialBpm) {
     }
 
     // Sort events by timestamp (in beats)
-    std::sort(allEvents.begin(), allEvents.end(), [](const MidiEvent& a, const MidiEvent& b) {
+    std::ranges::sort(allEvents, [](const MidiEvent &a, const MidiEvent &b) {
         if (a.timestamp != b.timestamp) {
             return a.timestamp < b.timestamp;
         }
         // Priorities at the same timestamp: NoteOff first, then state changes, then NoteOn
         auto typeOrder = [](MidiEventType t) {
             switch (t) {
-                case MidiEventType::NoteOff: return 0;
-                case MidiEventType::BpmChange: return 1;
-                case MidiEventType::ProgramChange: return 2;
-                case MidiEventType::VolumeChange: return 3;
-                case MidiEventType::NoteOn: return 4;
-                default: return 5;
+                case MidiEventType::NoteOff:
+                    return 0;
+                case MidiEventType::BpmChange:
+                    return 1;
+                case MidiEventType::ProgramChange:
+                    return 2;
+                case MidiEventType::VolumeChange:
+                    return 3;
+                case MidiEventType::NoteOn:
+                    return 4;
+                default:
+                    return 5;
             }
         };
         return typeOrder(a.type) < typeOrder(b.type);
@@ -50,11 +55,11 @@ void MidiPlayer::play(std::vector<Voice> voices, int initialBpm) {
     playbackEvents_.clear();
     playbackEvents_.reserve(allEvents.size());
 
-    double currentBeat = 0.0;
+    double currentBeat   = 0.0;
     double currentTimeMs = 0.0;
-    int currentBpm = initialBpm;
+    int    currentBpm    = initialBpm;
 
-    for (const auto& event : allEvents) {
+    for (const auto &event : allEvents) {
         double deltaBeats = event.timestamp - currentBeat;
         if (deltaBeats > 0.0) {
             double deltaTimeMs = deltaBeats * (SECONDS_PER_MINUTE / currentBpm) * MS_PER_SECOND;
@@ -64,12 +69,12 @@ void MidiPlayer::play(std::vector<Voice> voices, int initialBpm) {
         if (event.type == MidiEventType::BpmChange) {
             currentBpm = event.value;
         }
-        playbackEvents_.push_back({event, currentTimeMs});
+        playbackEvents_.push_back({.event = event, .timeMs = currentTimeMs});
     }
 
-    std::lock_guard<std::mutex> lock(stateMutex_);
-    isPlaying_ = true;
-    isPaused_ = false;
+    std::scoped_lock lock(stateMutex_);
+    isPlaying_  = true;
+    isPaused_   = false;
     initialBpm_ = initialBpm;
 
     playbackThread_ = std::thread(&MidiPlayer::playbackLoop, this);
@@ -77,11 +82,11 @@ void MidiPlayer::play(std::vector<Voice> voices, int initialBpm) {
 }
 
 void MidiPlayer::pause() {
-    std::lock_guard<std::mutex> lock(stateMutex_);
+    std::scoped_lock lock(stateMutex_);
     if (isPlaying_ && !isPaused_) {
         isPaused_ = true;
         if (audioOutput_) {
-            for (const auto& note : activeNotes_) {
+            for (const auto &note : activeNotes_) {
                 audioOutput_->noteOff(note.first, note.second);
             }
         }
@@ -90,7 +95,7 @@ void MidiPlayer::pause() {
 }
 
 void MidiPlayer::resume() {
-    std::lock_guard<std::mutex> lock(stateMutex_);
+    std::scoped_lock lock(stateMutex_);
     if (isPlaying_ && isPaused_) {
         isPaused_ = false;
     }
@@ -99,12 +104,12 @@ void MidiPlayer::resume() {
 void MidiPlayer::stop() {
     bool wasPlaying = false;
     {
-        std::lock_guard<std::mutex> lock(stateMutex_);
+        std::scoped_lock lock(stateMutex_);
         wasPlaying = isPlaying_;
         isPlaying_ = false;
-        isPaused_ = false;
+        isPaused_  = false;
         if (audioOutput_) {
-            for (const auto& note : activeNotes_) {
+            for (const auto &note : activeNotes_) {
                 audioOutput_->noteOff(note.first, note.second);
             }
         }
@@ -127,12 +132,12 @@ bool MidiPlayer::isPaused() const {
 }
 
 void MidiPlayer::playbackLoop() {
-    auto lastTickTime = std::chrono::steady_clock::now();
-    double elapsedMs = 0.0;
-    size_t eventIdx = 0;
+    auto   lastTickTime = std::chrono::steady_clock::now();
+    double elapsedMs    = 0.0;
+    size_t eventIdx     = 0;
 
     while (isPlaying_) {
-        auto now = std::chrono::steady_clock::now();
+        auto   now   = std::chrono::steady_clock::now();
         double delta = std::chrono::duration<double, std::milli>(now - lastTickTime).count();
         lastTickTime = now;
 
@@ -149,7 +154,7 @@ void MidiPlayer::playbackLoop() {
             break;
         }
 
-        const auto& pEvent = playbackEvents_[eventIdx];
+        const auto &pEvent = playbackEvents_[eventIdx];
         if (elapsedMs >= pEvent.timeMs) {
             dispatch(pEvent.event);
             eventIdx++;
@@ -169,14 +174,18 @@ void MidiPlayer::playbackLoop() {
     }
 }
 
-void MidiPlayer::dispatch(const MidiEvent& event) {
-    if (!audioOutput_) return;
-    
+void MidiPlayer::dispatch(const MidiEvent &event) {
+    if (!audioOutput_) {
+        return;
+    }
+
     // Concurrency protection for activeNotes_ access and to block events after pause/stop
     if (event.type == MidiEventType::NoteOn) {
-        std::lock_guard<std::mutex> lock(stateMutex_);
-        if (!isPlaying_ || isPaused_) return;
-        
+        std::scoped_lock lock(stateMutex_);
+        if (!isPlaying_ || isPaused_) {
+            return;
+        }
+
         int scaledVel = (event.velocity * masterVolume_.load()) / MAX_VOLUME_PERCENT;
         audioOutput_->noteOn(event.channel, event.pitch, scaledVel);
         if (scaledVel > 0) {
@@ -184,13 +193,11 @@ void MidiPlayer::dispatch(const MidiEvent& event) {
         } else {
             activeNotes_.erase({event.channel, event.pitch});
         }
-    }
-    else if (event.type == MidiEventType::NoteOff) {
-        std::lock_guard<std::mutex> lock(stateMutex_);
+    } else if (event.type == MidiEventType::NoteOff) {
+        std::scoped_lock lock(stateMutex_);
         audioOutput_->noteOff(event.channel, event.pitch);
         activeNotes_.erase({event.channel, event.pitch});
-    }
-    else {
+    } else {
         switch (event.type) {
             case MidiEventType::ProgramChange:
                 audioOutput_->programChange(event.channel, event.value);
@@ -211,7 +218,9 @@ void MidiPlayer::setMasterVolume(int volume) {
     if (audioOutput_) {
         int midiVol = (volume * MIDI_MAX_VALUE) / MAX_VOLUME_PERCENT;
         for (int ch = 0; ch < MIDI_CHANNELS; ++ch) {
-            if (ch == MIDI_DRUM_CHANNEL) continue;
+            if (ch == MIDI_DRUM_CHANNEL) {
+                continue;
+            }
             audioOutput_->setChannelVolume(ch, midiVol);
         }
     }

@@ -15,12 +15,7 @@
 #include <QCoreApplication>
 #include <cstdlib>
 
-MusicMachine::MusicMachine(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MusicMachine)
-    , audioEngine_(std::make_unique<AudioEngine>())
-    , midiPlayer_(std::make_unique<MidiPlayer>())
-{
+MusicMachine::MusicMachine(QWidget *parent) : QMainWindow(parent), ui(new Ui::MusicMachine), audioEngine_(std::make_unique<AudioEngine>()), midiPlayer_(std::make_unique<MidiPlayer>()) {
     ui->setupUi(this);
 
     // Initialize player
@@ -29,23 +24,21 @@ MusicMachine::MusicMachine(QWidget *parent)
     // Search and load SoundFont
     soundfontPath_ = findSoundFont();
     if (soundfontPath_.isEmpty()) {
-        QMessageBox::warning(this, tr("SoundFont Not Found"),
-            tr("Could not find a standard General MIDI SoundFont (.sf2) on your system.<br>"
-               "Please select one manually to enable audio playback."));
+        QMessageBox::warning(this, tr("SoundFont Not Found"), tr("Could not find a standard General MIDI SoundFont (.sf2) on your system.<br>"
+                                                                 "Please select one manually to enable audio playback."));
         soundfontPath_ = QFileDialog::getOpenFileName(this, tr("Select SoundFont"), "", tr("SoundFonts (*.sf2 *.sf3)"));
     }
 
     if (!soundfontPath_.isEmpty()) {
         if (!audioEngine_->initialize(soundfontPath_.toStdString())) {
-            QMessageBox::critical(this, tr("Initialization Error"),
-                tr("Failed to initialize the FluidSynth audio engine with the selected SoundFont."));
+            QMessageBox::critical(this, tr("Initialization Error"), tr("Failed to initialize the FluidSynth audio engine with the selected SoundFont."));
         } else {
+            ui->comboBox->setCurrentIndex(6); // Harpsichord (GM 6) is the default in the spec
             onInstrumentChanged(ui->comboBox->currentIndex());
             onVolumeChanged(ui->spinBox->value());
         }
     } else {
-        QMessageBox::warning(this, tr("Audio Disabled"),
-            tr("No SoundFont loaded. Audio playback will be disabled."));
+        QMessageBox::warning(this, tr("Audio Disabled"), tr("No SoundFont loaded. Audio playback will be disabled."));
     }
 
     setupConnections();
@@ -121,8 +114,7 @@ void MusicMachine::onPlayClicked() {
     } else {
         std::string text = ui->plainTextEdit->toPlainText().toStdString();
         if (text.empty()) {
-            QMessageBox::information(this, tr("Empty Sequence"),
-                tr("Please type a music sequence before playing."));
+            QMessageBox::information(this, tr("Empty Sequence"), tr("Please type a music sequence before playing."));
             return;
         }
 
@@ -142,7 +134,9 @@ void MusicMachine::onResetClicked() {
 
 void MusicMachine::onOpenClicked() {
     QString path = QFileDialog::getOpenFileName(this, tr("Open Music Sequence"), "", tr("Text Files (*.txt);;All Files (*)"));
-    if (path.isEmpty()) return;
+    if (path.isEmpty()) {
+        return;
+    }
 
     midiPlayer_->stop();
 
@@ -158,7 +152,9 @@ void MusicMachine::onOpenClicked() {
 
 void MusicMachine::onSaveClicked() {
     QString path = QFileDialog::getSaveFileName(this, tr("Save Music Sequence"), "", tr("Text Files (*.txt);;All Files (*)"));
-    if (path.isEmpty()) return;
+    if (path.isEmpty()) {
+        return;
+    }
 
     QFile file(path);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
@@ -172,14 +168,14 @@ void MusicMachine::onSaveClicked() {
 
 void MusicMachine::onExportMidiClicked() {
     QString path = QFileDialog::getSaveFileName(
-        this, tr("Export MIDI File"), "", tr("MIDI Files (*.mid);;All Files (*)")
-    );
-    if (path.isEmpty()) return;
+        this, tr("Export MIDI File"), "", tr("MIDI Files (*.mid);;All Files (*)"));
+    if (path.isEmpty()) {
+        return;
+    }
 
     std::string text = ui->plainTextEdit->toPlainText().toStdString();
     if (text.empty()) {
-        QMessageBox::information(this, tr("Empty Sequence"),
-            tr("Please type a music sequence before exporting."));
+        QMessageBox::information(this, tr("Empty Sequence"), tr("Please type a music sequence before exporting."));
         return;
     }
 
@@ -191,8 +187,8 @@ void MusicMachine::onExportMidiClicked() {
 
     MidiWriter writer;
     writer.createFile();
-    for (int i = 0; i < static_cast<int>(voices.size()); ++i) {
-        writer.writeVoiceTrack(i, voices[i]);
+    for (size_t i = 0; i < voices.size(); ++i) {
+        writer.writeVoiceTrack(static_cast<int>(i), voices[i]);
     }
 
     if (writer.save(path.toStdString())) {
@@ -221,7 +217,7 @@ void MusicMachine::onPlaybackFinished() {
 
 void MusicMachine::updatePlaybackUI() {
     bool playing = midiPlayer_->isPlaying();
-    bool paused = midiPlayer_->isPaused();
+    bool paused  = midiPlayer_->isPaused();
 
     if (playing) {
         if (paused) {
@@ -256,7 +252,7 @@ void MusicMachine::updatePlaybackUI() {
 
 QString MusicMachine::findSoundFont() const {
     // 1. Check environment variable SOUNDFONT
-    if (const char* envSf = std::getenv("SOUNDFONT")) {
+    if (const char *envSf = std::getenv("SOUNDFONT")) {
         if (QFile::exists(QString::fromLocal8Bit(envSf))) {
             return QString::fromLocal8Bit(envSf);
         }
@@ -268,19 +264,17 @@ QString MusicMachine::findSoundFont() const {
         "/usr/share/soundfonts",
         "/usr/share/sounds/sf3",
         "/usr/local/share/sounds/sf2",
-        "/usr/local/share/soundfonts"
-    };
+        "/usr/local/share/soundfonts"};
 
     const QStringList searchNames = {
         "FluidR3_GM.sf2",
         "FluidR3_GM.sf3",
         "fluid-soundfont.sf2",
         "FluidR3_GS.sf2",
-        "GeneralUser_GS.sf2"
-    };
+        "GeneralUser_GS.sf2"};
 
-    for (const auto& dir : searchDirs) {
-        for (const auto& name : searchNames) {
+    for (const auto &dir : searchDirs) {
+        for (const auto &name : searchNames) {
             QString path = dir + "/" + name;
             if (QFile::exists(path)) {
                 return path;
@@ -294,7 +288,9 @@ QString MusicMachine::findSoundFont() const {
 void MusicMachine::onInstrumentChanged(int index) {
     if (audioEngine_) {
         for (int ch = 0; ch < MIDI_CHANNELS; ++ch) {
-            if (ch == MIDI_DRUM_CHANNEL) continue;
+            if (ch == MIDI_DRUM_CHANNEL) {
+                continue;
+            }
             audioEngine_->programChange(ch, index);
         }
     }
@@ -322,11 +318,11 @@ void MusicMachine::populateLanguageMenu() {
         languageMenu_->clear();
     }
 
-    QActionGroup* langGroup = new QActionGroup(this);
+    auto *langGroup = new QActionGroup(this);
     langGroup->setExclusive(true);
 
     // 1. English (default)
-    QAction* engAction = languageMenu_->addAction(tr("English"));
+    QAction *engAction = languageMenu_->addAction(tr("English"));
     engAction->setCheckable(true);
     langGroup->addAction(engAction);
     if (currentLocale_ == "en" || currentLocale_.isEmpty()) {
@@ -338,26 +334,29 @@ void MusicMachine::populateLanguageMenu() {
     });
 
     // 2. Discover translations
-    QString qmDir = QCoreApplication::applicationDirPath() + "/translations";
+    QString     qmDir      = QCoreApplication::applicationDirPath() + "/translations";
     QStringList searchDirs = {
         qmDir,
         QCoreApplication::applicationDirPath(),
         QDir::currentPath() + "/src",
-        QDir::currentPath()
-    };
+        QDir::currentPath()};
 
     QSet<QString> foundLocales;
-    for (const auto& dirPath : searchDirs) {
+    for (const auto &dirPath : searchDirs) {
         QDir dir(dirPath);
-        if (!dir.exists()) continue;
+        if (!dir.exists()) {
+            continue;
+        }
 
         QStringList filters;
         filters << "musicMachine_*.qm";
         QFileInfoList list = dir.entryInfoList(filters, QDir::Files);
-        for (const auto& fileInfo : list) {
+        for (const auto &fileInfo : list) {
             QString baseName = fileInfo.baseName();
-            QString locale = baseName.mid(QString("musicMachine_").length());
-            if (foundLocales.contains(locale)) continue;
+            QString locale   = baseName.mid(QString("musicMachine_").length());
+            if (foundLocales.contains(locale)) {
+                continue;
+            }
             foundLocales.insert(locale);
 
             QLocale loc(locale);
@@ -368,7 +367,7 @@ void MusicMachine::populateLanguageMenu() {
                 langName[0] = langName[0].toUpper();
             }
 
-            QAction* action = languageMenu_->addAction(langName);
+            QAction *action = languageMenu_->addAction(langName);
             action->setCheckable(true);
             langGroup->addAction(action);
 
@@ -384,7 +383,7 @@ void MusicMachine::populateLanguageMenu() {
     }
 }
 
-void MusicMachine::loadLanguage(const QString& locale) {
+void MusicMachine::loadLanguage(const QString &locale) {
     if (currentTranslator_) {
         qApp->removeTranslator(currentTranslator_.get());
         currentTranslator_.reset();
@@ -396,18 +395,17 @@ void MusicMachine::loadLanguage(const QString& locale) {
         return;
     }
 
-    auto translator = std::make_unique<QTranslator>();
-    QString baseName = QString("musicMachine_%1").arg(locale);
-    QString qmDir = QCoreApplication::applicationDirPath() + "/translations";
+    auto        translator = std::make_unique<QTranslator>();
+    QString     baseName   = QString("musicMachine_%1").arg(locale);
+    QString     qmDir      = QCoreApplication::applicationDirPath() + "/translations";
     QStringList searchDirs = {
         qmDir,
         QCoreApplication::applicationDirPath(),
         QDir::currentPath() + "/src",
-        QDir::currentPath()
-    };
+        QDir::currentPath()};
 
     bool loaded = false;
-    for (const auto& dirPath : searchDirs) {
+    for (const auto &dirPath : searchDirs) {
         if (translator->load(baseName, dirPath)) {
             loaded = true;
             break;
@@ -417,11 +415,9 @@ void MusicMachine::loadLanguage(const QString& locale) {
     if (loaded) {
         qApp->installTranslator(translator.get());
         currentTranslator_ = std::move(translator);
-        currentLocale_ = locale;
+        currentLocale_     = locale;
     } else {
-        QMessageBox::warning(this, tr("Language Load Error"),
-            tr("Failed to load translation file for %1.").arg(locale));
+        QMessageBox::warning(this, tr("Language Load Error"), tr("Failed to load translation file for %1.").arg(locale));
     }
     populateLanguageMenu();
 }
-

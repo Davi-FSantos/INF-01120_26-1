@@ -1,13 +1,7 @@
 #include "AudioEngine.h"
 #include <stdexcept>
 
-AudioEngine::AudioEngine()
-    : settings_(nullptr),
-      synth_(nullptr),
-      adriver_(nullptr),
-      soundfontId_(-1),
-      isPlaying_(false) {
-}
+AudioEngine::AudioEngine() = default;
 
 AudioEngine::~AudioEngine() {
     shutdown();
@@ -15,16 +9,27 @@ AudioEngine::~AudioEngine() {
 
 bool AudioEngine::initialize(std::string sfPath) {
     settings_ = new_fluid_settings();
-    if (!settings_) return false;
+    if (!settings_) {
+        return false;
+    }
 
     synth_ = new_fluid_synth(settings_);
-    if (!synth_) return false;
+    if (!synth_) {
+        shutdown();
+        return false;
+    }
 
     adriver_ = new_fluid_audio_driver(settings_, synth_);
-    if (!adriver_) return false;
+    if (!adriver_) {
+        shutdown();
+        return false;
+    }
 
     soundfontId_ = fluid_synth_sfload(synth_, sfPath.c_str(), 1);
-    if (soundfontId_ == FLUID_FAILED) return false;
+    if (soundfontId_ == FLUID_FAILED) {
+        shutdown();
+        return false;
+    }
 
     return true;
 }
@@ -54,5 +59,5 @@ void AudioEngine::shutdown() {
         settings_ = nullptr;
     }
     soundfontId_ = -1;
-    isPlaying_ = false;
+    isPlaying_   = false;
 }

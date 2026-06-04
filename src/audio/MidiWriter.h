@@ -7,16 +7,16 @@
 #include "src/core/Voice.h"
 
 class MidiWriter {
-public:
+    public:
     MidiWriter();
     ~MidiWriter() = default;
 
     void createFile();
     void writeVoiceTrack(int trackIndex, Voice voice);
-    bool save(const std::string& filepath);
+    bool save(const std::string &filepath);
 
-private:
-    libremidi::writer writer_;
+    private:
+    libremidi::writer    writer_;
     static constexpr int TICKS_PER_BEAT = 480;
 };
 

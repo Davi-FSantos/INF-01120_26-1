@@ -6,7 +6,7 @@
 #include <optional>
 
 // Helper function to drain all events from a Voice
-static std::vector<MidiEvent> getEvents(Voice& voice) {
+static std::vector<MidiEvent> getEvents(Voice &voice) {
     std::vector<MidiEvent> events;
     while (voice.hasEvents()) {
         auto ev = voice.getNextEvent();
@@ -22,7 +22,7 @@ TEST_CASE("Voice Fugue Defaults") {
     Voice v0(0);
     CHECK(v0.currentOctave == 6);
     CHECK(v0.currentVolume == 100);
-    CHECK(v0.currentInstrument == 0);
+    CHECK(v0.currentInstrument == 6);
     CHECK(v0.channel == 0);
 
     // V1 alto
@@ -36,22 +36,35 @@ TEST_CASE("Voice Fugue Defaults") {
     Voice v2(2);
     CHECK(v2.currentOctave == 4);
     CHECK(v2.currentVolume == 60);
-    CHECK(v2.currentInstrument == 6);
+    CHECK(v2.currentInstrument == 0);
     CHECK(v2.channel == 2);
 
     // V3 bass
     Voice v3(3);
     CHECK(v3.currentOctave == 3);
     CHECK(v3.currentVolume == 40);
-    CHECK(v3.currentInstrument == 71);
+    CHECK(v3.currentInstrument == 70);
     CHECK(v3.channel == 3);
 
     // V4 cycles to V0 properties
     Voice v4(4);
     CHECK(v4.currentOctave == 6);
     CHECK(v4.currentVolume == 100);
-    CHECK(v4.currentInstrument == 0);
+    CHECK(v4.currentInstrument == 6);
     CHECK(v4.channel == 4);
+
+    // Channel mapping checks (skipping percussion channel 9)
+    Voice v8(8);
+    CHECK(v8.channel == 8);
+
+    Voice v9(9);
+    CHECK(v9.channel == 10); // Channel 9 is skipped
+
+    Voice v14(14);
+    CHECK(v14.channel == 15);
+
+    Voice v15(15);
+    CHECK(v15.channel == 0); // Wraps around
 }
 
 TEST_CASE("Voice noteToMidiPitch") {
@@ -90,15 +103,15 @@ TEST_CASE("Voice noteToMidiPitch") {
 
 TEST_CASE("TextParser - Notes and ProgramChange Events") {
     TextParser parser;
-    auto voices = parser.parse("C", 120);
+    auto       voices = parser.parse("C", 120);
     REQUIRE(voices.size() == 1);
     auto events = getEvents(voices[0]);
-    
-    // Default instrument for V0 is 0.
-    // Events: 1. ProgramChange (value 0, timestamp 0), 2. NoteOn (pitch 84, volume 100, timestamp 0), 3. NoteOff (pitch 84, timestamp 1)
+
+    // Default instrument for V0 is 6 (Cravo).
+    // Events: 1. ProgramChange (value 6, timestamp 0), 2. NoteOn (pitch 84, volume 100, timestamp 0), 3. NoteOff (pitch 84, timestamp 1)
     REQUIRE(events.size() == 3);
     CHECK(events[0].type == MidiEventType::ProgramChange);
-    CHECK(events[0].value == 0);
+    CHECK(events[0].value == 6);
     CHECK(events[0].timestamp == 0.0);
 
     CHECK(events[1].type == MidiEventType::NoteOn);
@@ -113,7 +126,7 @@ TEST_CASE("TextParser - Notes and ProgramChange Events") {
 
 TEST_CASE("TextParser - Lowercase Rests") {
     TextParser parser;
-    auto voices = parser.parse("C a D", 120);
+    auto       voices = parser.parse("C a D", 120);
     REQUIRE(voices.size() == 1);
     auto events = getEvents(voices[0]);
 
@@ -144,7 +157,7 @@ TEST_CASE("TextParser - Lowercase Rests") {
 
 TEST_CASE("TextParser - Volume Adjustments") {
     TextParser parser;
-    auto voices = parser.parse("C  ", 120); // Volume 100, then two spaces.
+    auto       voices = parser.parse("C  ", 120); // Volume 100, then two spaces.
     REQUIRE(voices.size() == 1);
     auto events = getEvents(voices[0]);
 
@@ -188,14 +201,14 @@ TEST_CASE("TextParser - Instrument Mappings") {
     SUBCASE("Digits (Even and Odd)") {
         auto voices = parser.parse("01234", 120);
         auto events = getEvents(voices[0]);
-        // PC(0) at 0
-        // '0' -> even -> current + 0 = 0 -> PC(0) at 0
+        // PC(6) at 0
+        // '0' -> even -> current + 0 = 6 -> PC(6) at 0
         // '1' -> odd -> PC(15) (Tubular Bells) at 0
         // '2' -> even -> current (15) + 2 = 17 -> PC(17) at 0
         // '3' -> odd -> PC(15) at 0
         // '4' -> even -> current (15) + 4 = 19 -> PC(19) at 0
         REQUIRE(events.size() == 6);
-        CHECK(events[1].value == 0);
+        CHECK(events[1].value == 6);
         CHECK(events[2].value == 15);
         CHECK(events[3].value == 17);
         CHECK(events[4].value == 15);
@@ -205,7 +218,7 @@ TEST_CASE("TextParser - Instrument Mappings") {
     SUBCASE("Semicolon ; and Comma ,") {
         auto voices = parser.parse(";,", 120);
         auto events = getEvents(voices[0]);
-        // PC(0), PC(15) [;], PC(20) [,]
+        // PC(6), PC(15) [;], PC(20) [,]
         REQUIRE(events.size() == 3);
         CHECK(events[1].value == 15); // Tubular bells
         CHECK(events[2].value == 20); // Church organ
@@ -271,15 +284,15 @@ TEST_CASE("TextParser - Consonants and Repetition") {
     SUBCASE("Consonant after rest behaves as silence") {
         auto voices = parser.parse("aX", 120); // Rest 'a', then consonant X.
         auto events = getEvents(voices[0]);
-        REQUIRE(events.size() == 1); // Only initial ProgramChange
+        REQUIRE(events.size() == 1);         // Only initial ProgramChange
         CHECK(voices[0].currentBeat == 2.0); // Rest is 1.0, X is 1.0.
     }
 }
 
 TEST_CASE("TextParser - Polyphony and Delays") {
-    TextParser parser;
+    TextParser  parser;
     std::string testText = "[4] C\n[2] D";
-    auto voices = parser.parse(testText, 120);
+    auto        voices   = parser.parse(testText, 120);
     REQUIRE(voices.size() == 2);
 
     // Voice 0 ( soprano index 0, default instrument 0, octave 6 )
@@ -305,7 +318,7 @@ TEST_CASE("TextParser - Polyphony and Delays") {
 
 TEST_CASE("TextParser - Global BPM Control") {
     TextParser parser;
-    auto voices = parser.parse(">C<D", 120);
+    auto       voices = parser.parse(">C<D", 120);
     REQUIRE(voices.size() == 1);
     auto events = getEvents(voices[0]);
 
@@ -335,7 +348,7 @@ TEST_CASE("TextParser - Global BPM Control") {
 
 TEST_CASE("TextParser - Flat Notes (Eb, Ab, Mb)") {
     TextParser parser;
-    auto voices = parser.parse("Eb Ab Mb", 120);
+    auto       voices = parser.parse("Eb Ab Mb", 120);
     REQUIRE(voices.size() == 1);
     auto events = getEvents(voices[0]);
 
@@ -350,7 +363,7 @@ TEST_CASE("TextParser - Flat Notes (Eb, Ab, Mb)") {
     // 7: NoteOn Mb (pitch 87) at 2.0
     // 8: NoteOff Mb at 3.0
     REQUIRE(events.size() == 9);
-    
+
     CHECK(events[1].type == MidiEventType::NoteOn);
     CHECK(events[1].pitch == 87);
     CHECK(events[1].timestamp == 0.0);

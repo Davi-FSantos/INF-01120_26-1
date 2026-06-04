@@ -7,5 +7,5 @@ int main(int argc, char *argv[]) {
     MusicMachine w;
     w.show();
 
-    return app.exec();
+    return QApplication::exec();
 }

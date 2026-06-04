@@ -2,7 +2,7 @@
 #include <iostream>
 #include <source_location>
 
-void handle_contract_violation(const std::contracts::contract_violation& violation) noexcept {
+void handle_contract_violation(const std::contracts::contract_violation &violation) noexcept {
     const auto loc = violation.location();
     std::cerr << "=======================================\n"
               << "C++26 CONTRACT VIOLATION DETECTED!\n"
@@ -10,5 +10,6 @@ void handle_contract_violation(const std::contracts::contract_violation& violati
               << "  Line:     " << loc.line() << "\n"
               << "  Function: " << loc.function_name() << "\n"
               << "  Comment:  " << violation.comment() << "\n"
-              << "=======================================\n" << std::endl;
+              << "=======================================\n"
+              << std::endl;
 }

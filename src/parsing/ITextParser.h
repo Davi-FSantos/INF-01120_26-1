@@ -6,10 +6,10 @@
 #include "src/core/Voice.h"
 
 class ITextParser {
-public:
+    public:
     virtual ~ITextParser() = default;
 
-    virtual std::vector<Voice> parse(const std::string& text, int initialBpm) = 0;
+    virtual std::vector<Voice> parse(const std::string &text, int initialBpm) = 0;
 };
 
 #endif // ITEXT_PARSER_H

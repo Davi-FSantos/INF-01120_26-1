@@ -5,20 +5,22 @@
 #include <QEvent>
 
 QT_BEGIN_NAMESPACE
-namespace Ui { class AboutDialog; }
+namespace Ui {
+    class AboutDialog;
+}
 QT_END_NAMESPACE
 
 class AboutDialog : public QDialog {
     Q_OBJECT
 
-public:
+    public:
     explicit AboutDialog(QWidget *parent = nullptr);
     ~AboutDialog() override;
 
-protected:
+    protected:
     void changeEvent(QEvent *event) override;
 
-private:
+    private:
     Ui::AboutDialog *ui;
 };
 
