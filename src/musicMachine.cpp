@@ -1,5 +1,5 @@
-#include "mainwindow.h"
-#include "ui_qtmidi.h"
+#include "musicMachine.h"
+#include "ui_musicMachine.h"
 #include "src/parsing/TextParser.h"
 #include "aboutdialog.h"
 #include "src/audio/MidiWriter.h"
@@ -8,9 +8,14 @@
 #include <QFile>
 #include <QTextStream>
 #include <QIcon>
+#include <QDir>
+#include <QSet>
+#include <QLocale>
+#include <QActionGroup>
+#include <QCoreApplication>
 #include <cstdlib>
 
-MainWindow::MainWindow(QWidget *parent)
+MusicMachine::MusicMachine(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MusicMachine)
     , audioEngine_(std::make_unique<AudioEngine>())
@@ -47,33 +52,33 @@ MainWindow::MainWindow(QWidget *parent)
     updatePlaybackUI();
 }
 
-MainWindow::~MainWindow() {
+MusicMachine::~MusicMachine() {
     delete ui;
 }
 
-void MainWindow::setupConnections() {
+void MusicMachine::setupConnections() {
     // Playback Buttons
-    connect(ui->pushButton_3, &QPushButton::clicked, this, &MainWindow::onPlayClicked);
-    connect(ui->pushButton_4, &QPushButton::clicked, this, &MainWindow::onResetClicked);
+    connect(ui->pushButton_3, &QPushButton::clicked, this, &MusicMachine::onPlayClicked);
+    connect(ui->pushButton_4, &QPushButton::clicked, this, &MusicMachine::onResetClicked);
 
     // File Buttons
-    connect(ui->pushButton, &QPushButton::clicked, this, &MainWindow::onOpenClicked);
-    connect(ui->pushButton_2, &QPushButton::clicked, this, &MainWindow::onSaveClicked);
+    connect(ui->pushButton, &QPushButton::clicked, this, &MusicMachine::onOpenClicked);
+    connect(ui->pushButton_2, &QPushButton::clicked, this, &MusicMachine::onSaveClicked);
 
     // Menu Actions
-    connect(ui->actionPlay, &QAction::triggered, this, &MainWindow::onPlayClicked);
-    connect(ui->actionPause, &QAction::triggered, this, &MainWindow::onPlayClicked); // Toggle Play/Pause
-    connect(ui->actionReset, &QAction::triggered, this, &MainWindow::onResetClicked);
-    connect(ui->actionOpen, &QAction::triggered, this, &MainWindow::onOpenClicked);
-    connect(ui->actionSave, &QAction::triggered, this, &MainWindow::onSaveClicked);
-    connect(ui->action_mid, &QAction::triggered, this, &MainWindow::onExportMidiClicked);
-    connect(ui->action_txt, &QAction::triggered, this, &MainWindow::onSaveClicked);
-    connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::onAboutTriggered);
+    connect(ui->actionPlay, &QAction::triggered, this, &MusicMachine::onPlayClicked);
+    connect(ui->actionPause, &QAction::triggered, this, &MusicMachine::onPlayClicked); // Toggle Play/Pause
+    connect(ui->actionReset, &QAction::triggered, this, &MusicMachine::onResetClicked);
+    connect(ui->actionOpen, &QAction::triggered, this, &MusicMachine::onOpenClicked);
+    connect(ui->actionSave, &QAction::triggered, this, &MusicMachine::onSaveClicked);
+    connect(ui->action_mid, &QAction::triggered, this, &MusicMachine::onExportMidiClicked);
+    connect(ui->action_txt, &QAction::triggered, this, &MusicMachine::onSaveClicked);
+    connect(ui->actionAbout, &QAction::triggered, this, &MusicMachine::onAboutTriggered);
 
     // Player Signals
-    connect(midiPlayer_.get(), &MidiPlayer::playbackStarted, this, &MainWindow::onPlaybackStarted);
-    connect(midiPlayer_.get(), &MidiPlayer::playbackStopped, this, &MainWindow::onPlaybackStopped);
-    connect(midiPlayer_.get(), &MidiPlayer::playbackFinished, this, &MainWindow::onPlaybackFinished);
+    connect(midiPlayer_.get(), &MidiPlayer::playbackStarted, this, &MusicMachine::onPlaybackStarted);
+    connect(midiPlayer_.get(), &MidiPlayer::playbackStopped, this, &MusicMachine::onPlaybackStopped);
+    connect(midiPlayer_.get(), &MidiPlayer::playbackFinished, this, &MusicMachine::onPlaybackFinished);
 
     // Edit Menu Actions -> plainTextEdit Slots
     connect(ui->actionUndo, &QAction::triggered, ui->plainTextEdit, &QPlainTextEdit::undo);
@@ -87,8 +92,8 @@ void MainWindow::setupConnections() {
     });
 
     // Instrument and Volume widget connections
-    connect(ui->comboBox, &QComboBox::currentIndexChanged, this, &MainWindow::onInstrumentChanged);
-    connect(ui->spinBox, &QSpinBox::valueChanged, this, &MainWindow::onVolumeChanged);
+    connect(ui->comboBox, &QComboBox::currentIndexChanged, this, &MusicMachine::onInstrumentChanged);
+    connect(ui->spinBox, &QSpinBox::valueChanged, this, &MusicMachine::onVolumeChanged);
 
     // Playback menu action focus triggers
     connect(ui->actionChange_Instrument, &QAction::triggered, this, [this]() {
@@ -99,9 +104,12 @@ void MainWindow::setupConnections() {
         ui->spinBox_2->setFocus();
         ui->spinBox_2->selectAll();
     });
+
+    // Dynamic Language submenu setup
+    populateLanguageMenu();
 }
 
-void MainWindow::onPlayClicked() {
+void MusicMachine::onPlayClicked() {
     if (midiPlayer_->isPlaying()) {
         if (midiPlayer_->isPaused()) {
             midiPlayer_->resume();
@@ -128,11 +136,11 @@ void MainWindow::onPlayClicked() {
     }
 }
 
-void MainWindow::onResetClicked() {
+void MusicMachine::onResetClicked() {
     midiPlayer_->stop();
 }
 
-void MainWindow::onOpenClicked() {
+void MusicMachine::onOpenClicked() {
     QString path = QFileDialog::getOpenFileName(this, tr("Open Music Sequence"), "", tr("Text Files (*.txt);;All Files (*)"));
     if (path.isEmpty()) return;
 
@@ -148,7 +156,7 @@ void MainWindow::onOpenClicked() {
     ui->plainTextEdit->setPlainText(in.readAll());
 }
 
-void MainWindow::onSaveClicked() {
+void MusicMachine::onSaveClicked() {
     QString path = QFileDialog::getSaveFileName(this, tr("Save Music Sequence"), "", tr("Text Files (*.txt);;All Files (*)"));
     if (path.isEmpty()) return;
 
@@ -162,7 +170,7 @@ void MainWindow::onSaveClicked() {
     out << ui->plainTextEdit->toPlainText();
 }
 
-void MainWindow::onExportMidiClicked() {
+void MusicMachine::onExportMidiClicked() {
     QString path = QFileDialog::getSaveFileName(
         this, tr("Export MIDI File"), "", tr("MIDI Files (*.mid);;All Files (*)")
     );
@@ -194,24 +202,24 @@ void MainWindow::onExportMidiClicked() {
     }
 }
 
-void MainWindow::onAboutTriggered() {
+void MusicMachine::onAboutTriggered() {
     AboutDialog dialog(this);
     dialog.exec();
 }
 
-void MainWindow::onPlaybackStarted() {
+void MusicMachine::onPlaybackStarted() {
     updatePlaybackUI();
 }
 
-void MainWindow::onPlaybackStopped() {
+void MusicMachine::onPlaybackStopped() {
     updatePlaybackUI();
 }
 
-void MainWindow::onPlaybackFinished() {
+void MusicMachine::onPlaybackFinished() {
     updatePlaybackUI();
 }
 
-void MainWindow::updatePlaybackUI() {
+void MusicMachine::updatePlaybackUI() {
     bool playing = midiPlayer_->isPlaying();
     bool paused = midiPlayer_->isPaused();
 
@@ -246,7 +254,7 @@ void MainWindow::updatePlaybackUI() {
     }
 }
 
-QString MainWindow::findSoundFont() const {
+QString MusicMachine::findSoundFont() const {
     // 1. Check environment variable SOUNDFONT
     if (const char* envSf = std::getenv("SOUNDFONT")) {
         if (QFile::exists(QString::fromLocal8Bit(envSf))) {
@@ -283,7 +291,7 @@ QString MainWindow::findSoundFont() const {
     return "";
 }
 
-void MainWindow::onInstrumentChanged(int index) {
+void MusicMachine::onInstrumentChanged(int index) {
     if (audioEngine_) {
         for (int ch = 0; ch < MIDI_CHANNELS; ++ch) {
             if (ch == MIDI_DRUM_CHANNEL) continue;
@@ -292,9 +300,128 @@ void MainWindow::onInstrumentChanged(int index) {
     }
 }
 
-void MainWindow::onVolumeChanged(int value) {
+void MusicMachine::onVolumeChanged(int value) {
     if (midiPlayer_) {
         midiPlayer_->setMasterVolume(value);
     }
+}
+
+void MusicMachine::changeEvent(QEvent *event) {
+    if (event->type() == QEvent::LanguageChange) {
+        ui->retranslateUi(this);
+        updatePlaybackUI();
+    }
+    QMainWindow::changeEvent(event);
+}
+
+void MusicMachine::populateLanguageMenu() {
+    if (!languageMenu_) {
+        languageMenu_ = new QMenu(this);
+        ui->actionLanguage->setMenu(languageMenu_);
+    } else {
+        languageMenu_->clear();
+    }
+
+    QActionGroup* langGroup = new QActionGroup(this);
+    langGroup->setExclusive(true);
+
+    // 1. English (default)
+    QAction* engAction = languageMenu_->addAction(tr("English"));
+    engAction->setCheckable(true);
+    langGroup->addAction(engAction);
+    if (currentLocale_ == "en" || currentLocale_.isEmpty()) {
+        engAction->setChecked(true);
+        engAction->setEnabled(false);
+    }
+    connect(engAction, &QAction::triggered, this, [this]() {
+        loadLanguage("en");
+    });
+
+    // 2. Discover translations
+    QString qmDir = QCoreApplication::applicationDirPath() + "/translations";
+    QStringList searchDirs = {
+        qmDir,
+        QCoreApplication::applicationDirPath(),
+        QDir::currentPath() + "/src",
+        QDir::currentPath()
+    };
+
+    QSet<QString> foundLocales;
+    for (const auto& dirPath : searchDirs) {
+        QDir dir(dirPath);
+        if (!dir.exists()) continue;
+
+        QStringList filters;
+        filters << "musicMachine_*.qm";
+        QFileInfoList list = dir.entryInfoList(filters, QDir::Files);
+        for (const auto& fileInfo : list) {
+            QString baseName = fileInfo.baseName();
+            QString locale = baseName.mid(QString("musicMachine_").length());
+            if (foundLocales.contains(locale)) continue;
+            foundLocales.insert(locale);
+
+            QLocale loc(locale);
+            QString langName = loc.nativeLanguageName();
+            if (langName.isEmpty()) {
+                langName = locale;
+            } else {
+                langName[0] = langName[0].toUpper();
+            }
+
+            QAction* action = languageMenu_->addAction(langName);
+            action->setCheckable(true);
+            langGroup->addAction(action);
+
+            if (currentLocale_ == locale) {
+                action->setChecked(true);
+                action->setEnabled(false);
+            }
+
+            connect(action, &QAction::triggered, this, [this, locale]() {
+                loadLanguage(locale);
+            });
+        }
+    }
+}
+
+void MusicMachine::loadLanguage(const QString& locale) {
+    if (currentTranslator_) {
+        qApp->removeTranslator(currentTranslator_.get());
+        currentTranslator_.reset();
+    }
+
+    if (locale == "en") {
+        currentLocale_ = "en";
+        populateLanguageMenu();
+        return;
+    }
+
+    auto translator = std::make_unique<QTranslator>();
+    QString baseName = QString("musicMachine_%1").arg(locale);
+    QString qmDir = QCoreApplication::applicationDirPath() + "/translations";
+    QStringList searchDirs = {
+        qmDir,
+        QCoreApplication::applicationDirPath(),
+        QDir::currentPath() + "/src",
+        QDir::currentPath()
+    };
+
+    bool loaded = false;
+    for (const auto& dirPath : searchDirs) {
+        if (translator->load(baseName, dirPath)) {
+            loaded = true;
+            break;
+        }
+    }
+
+    if (loaded) {
+        qApp->installTranslator(translator.get());
+        currentTranslator_ = std::move(translator);
+        currentLocale_ = locale;
+    } else {
+        QMessageBox::warning(this, tr("Language Load Error"),
+            tr("Failed to load translation file for %1.").arg(locale));
+    }
+    populateLanguageMenu();
 }
 
