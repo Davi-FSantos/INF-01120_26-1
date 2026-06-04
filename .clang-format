@@ -1,12 +1,17 @@
 # Configuration for the formater
 
+Language: Cpp
 
-# base config
+### base config ###
 basedOnStyle: Google
 
-# generic stuff
-IndentWidth: 4
-ColumnLimit: 100
-TabWidth: 4
+### indentation ###
 UseTab: Never
+IndentWidth: 8
+TabWidth: 8
+#ColumnLimit: 100
+AlignConsecutiveDeclarations: true
+
+
+
 
