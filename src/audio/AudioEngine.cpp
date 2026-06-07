@@ -13,6 +13,9 @@ bool AudioEngine::initialize(std::string sfPath) {
         return false;
     }
 
+    // Enable dynamic on-demand sample loading to minimize RAM footprint
+    fluid_settings_setint(settings_, "synth.dynamic-sample-loading", 1);
+
     synth_ = new_fluid_synth(settings_);
     if (!synth_) {
         shutdown();
