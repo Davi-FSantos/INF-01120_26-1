@@ -1,35 +1,79 @@
 @startuml
 
 class MainWindow {
-    - musicMachine : MusicMachine
-    - textEditor : QTextEdit*
-    - playButton : QPushButton*
-    - pauseButton : QPushButton*
-    - stopButton : QPushButton*
-    - bpmSpinBox : QSpinBox*
-    - exportButton : QPushButton*
-    - fileMenu : QMenu*
-    + setupUI() : void
-    + onPlayClicked() : void
-    + onPauseClicked() : void
-    + onStopClicked() : void
-    + onExportClicked() : void
-    + onOpenFile() : void
-    + onSaveFile() : void
+    - ui : Ui::MusicMachine*
+    - audioEngine : std::unique_ptr<AudioEngine>
+    - midiPlayer : std::unique_ptr<MidiPlayer>
+    - soundfontPath : QString
+    + MainWindow(parent : QWidget*)
+    + ~MainWindow()
+    - onPlayClicked() : void
+    - onResetClicked() : void
+    - onOpenClicked() : void
+    - onSaveClicked() : void
+    - onExportMidiClicked() : void
+    - onAboutTriggered() : void
+    - onInstrumentChanged(index : int) : void
+    - onVolumeChanged(value : int) : void
+    - setupConnections() : void
+    - updatePlaybackUI() : void
+    - findSoundFont() : QString
 }
 
-class MusicMachine {
-    - voices : std::vector<Voice>
-    - globalBPM : int
-    - tokenProcessor : TokenProcessor
-    - audioEngine : AudioEngine
-    + initialize(text : std::string) : void
-    + play() : void
+class AboutDialog {
+    - ui : Ui::AboutDialog*
+    + AboutDialog(parent : QWidget*)
+    + ~AboutDialog()
+    - onSourceCodeClicked() : void
+}
+
+interface IAudioOutput {
+    + initialize(sfPath : std::string) : bool
+    + noteOn(channel : int, key : int, velocity : int) : void
+    + noteOff(channel : int, key : int) : void
+    + programChange(channel : int, program : int) : void
+    + setChannelVolume(channel : int, volume : int) : void
+    + shutdown() : void
+}
+
+class AudioEngine {
+    - settings_ : fluid_settings_t*
+    - synth_ : fluid_synth_t*
+    - adriver_ : fluid_audio_driver_t*
+    - soundfontId_ : int
+    - isPlaying_ : bool
+    + AudioEngine()
+    + ~AudioEngine()
+    + initialize(sfPath : std::string) : bool
+    + noteOn(channel : int, key : int, velocity : int) : void
+    + noteOff(channel : int, key : int) : void
+    + programChange(channel : int, program : int) : void
+    + setChannelVolume(channel : int, volume : int) : void
+    + shutdown() : void
+}
+
+class MidiPlayer {
+    - audioOutput_ : IAudioOutput*
+    - playbackThread_ : std::thread
+    - isPlaying_ : std::atomic<bool>
+    - isPaused_ : std::atomic<bool>
+    - masterVolume_ : std::atomic<int>
+    - playbackEvents_ : std::vector<PlaybackEvent>
+    - initialBpm_ : int
+    - activeNotes_ : std::set<std::pair<int, int>>
+    - stateMutex_ : std::mutex
+    + MidiPlayer(parent : QObject*)
+    + ~MidiPlayer()
+    + initialize(audioOutput : IAudioOutput*) : void
+    + play(voices : std::vector<Voice>, initialBpm : int) : void
     + pause() : void
+    + resume() : void
     + stop() : void
-    + setBPM(bpm : int) : void
-    + adjustBPM(delta : int) : void
-    + exportToMidi(filepath : std::string) : bool
+    + setMasterVolume(volume : int) : void
+    + isPlaying() : bool
+    + isPaused() : bool
+    - playbackLoop() : void
+    - dispatch(event : const MidiEvent&) : void
 }
 
 class Voice {
@@ -50,41 +94,65 @@ class Voice {
     + hasEvents() : bool
 }
 
-class TokenProcessor {
-    - mappingRules : std::unordered_map<char, Instruction>
-    + tokenize(input : std::string, voices : std::vector<Voice>&) : void
-    + parseLine(line : std::string, voiceIndex : int, voice : Voice&) : void
-    + parseDelay(line : std::string) : int
+interface ITextParser {
+    + parse(text : const std::string&, initialBpm : int) : std::vector<Voice>
 }
 
-class AudioEngine {
-    - settings : fluid_settings_t*
-    - synth : fluid_synth_t*
-    - adriver : fluid_audio_driver_t*
-    - soundfontId : int
-    - isPlaying : bool
-    + initialize(sfPath : std::string) : bool
-    + noteOn(channel : int, key : int, velocity : int) : void
-    + noteOff(channel : int, key : int) : void
-    + programChange(channel : int, program : int) : void
-    + setChannelVolume(channel : int, volume : int) : void
-    + shutdown() : void
+class TextParser {
+    - charRules_ : std::unordered_map<char, Action>
+    - defaultInstrument_ : int
+    + TextParser()
+    + parse(text : const std::string&, initialBpm : int) : std::vector<Voice>
+    + setDefaultInstrument(instrument : int) : void
+    - buildRules() : void
+    - parseDelay(line : const std::string&, pos : size_t&) : int
+    - processCharacter(c : char, voice : Voice&) : void
 }
 
 class MidiWriter {
-    - midiFile : smf::MidiFile
+    - writer_ : libremidi::writer
+    - {static} TICKS_PER_BEAT : int = 480
+    + MidiWriter()
+    + ~MidiWriter()
     + createFile() : void
     + writeVoiceTrack(trackIndex : int, voice : Voice) : void
-    + save(filepath : std::string) : bool
+    + save(filepath : const std::string&) : bool
 }
 
-MainWindow *-- MusicMachine : contains
-MusicMachine *-- "1..*" Voice : contains
-MusicMachine *-- TokenProcessor : uses
-MusicMachine *-- AudioEngine : uses
-MusicMachine ..> MidiWriter : uses
-TokenProcessor ..> Voice : populates
-AudioEngine ..> Voice : reads
-MidiWriter ..> Voice : reads
+struct MidiEvent {
+    + type : MidiEventType
+    + pitch : int
+    + velocity : int
+    + timestamp : double
+    + duration : double
+    + channel : int
+    + value : int
+}
+
+enum MidiEventType {
+    NoteOn
+    NoteOff
+    ProgramChange
+    VolumeChange
+    BpmChange
+}
+
+IAudioOutput <|-- AudioEngine
+ITextParser <|-- TextParser
+
+MainWindow *-- AudioEngine : creates/owns
+MainWindow *-- MidiPlayer : creates/owns
+MainWindow ..> AboutDialog : creates/opens
+MainWindow ..> ITextParser : uses
+MainWindow ..> MidiWriter : creates/uses
+
+MidiPlayer o-- IAudioOutput : references
+MidiPlayer *-- Voice : uses
+MidiPlayer ..> MidiEvent : dispatches
+
+TextParser ..> Voice : populates
+Voice *-- MidiEvent : queues
+MidiWriter ..> Voice : uses
+MidiEvent +-- MidiEventType
 
 @enduml

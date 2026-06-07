@@ -6,18 +6,20 @@
 #include <functional>
 
 class TextParser : public ITextParser {
-public:
+    public:
     TextParser();
 
-    std::vector<Voice> parse(const std::string& text, int initialBpm) override;
+    std::vector<Voice> parse(const std::string &text, int initialBpm) override;
+    void               setDefaultInstrument(int instrument);
 
-private:
-    using Action = std::function<void(Voice&)>;
+    private:
+    using Action = std::function<void(Voice &)>;
     std::unordered_map<char, Action> charRules_;
+    int                              defaultInstrument_{6};
 
-    void buildRules();
-    int parseDelay(const std::string& line, size_t& pos) const;
-    void processCharacter(char c, Voice& voice) const;
+    void       buildRules();
+    static int parseDelay(const std::string &line, size_t &pos);
+    void       processCharacter(char character, Voice &voice) const;
 };
 
 #endif // TEXT_PARSER_H

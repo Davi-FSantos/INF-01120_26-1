@@ -62,113 +62,159 @@ O sistema deve:
 == Classe Voice
 
 *Atributos:*
-- `instrument: int` - Armazena o ID do instrumento MIDI ativo para a trilha (0-127)
-- `volume: int` - Armazena o volume atual da trilha (0-127)
-- `octave: int` - Armazena a oitava local atual (0-9)
-- `initialDelay: int` - Armazena a quantidade de batidas de atraso inicial (`[n]`) da voz
-- `noteQueue: std::queue<MidiEvent>` - Fila de eventos musicais (notas e silêncios) agendados
-- `lastNote: int` - Armazena a última nota MIDI reproduzida (para regras de repetição)
-- `isPlaying: bool` - Indica se a voz está sendo ativamente processada
+- ```cpp instrument: int``` - Armazena o ID do instrumento MIDI ativo para a trilha (0-127)
+- ```cpp volume: int``` - Armazena o volume atual da trilha (0-127)
+- ```cpp octave: int``` - Armazena a oitava local atual (0-9)
+- ```cpp initialDelay: int``` - Armazena a quantidade de batidas de atraso inicial (```cpp [n]```) da voz
+- ```cpp noteQueue: std::queue<MidiEvent>``` - Fila de eventos musicais (notas e silêncios) agendados
+- ```cpp lastNote: int``` - Armazena a última nota MIDI reproduzida (para regras de repetição)
+- ```cpp isPlaying: bool``` - Indica se a voz está sendo ativamente processada
 
 *Métodos:*
-- `reset(baseInstrument: int, baseVolume: int, baseOctave: int, delay: int): void` - Restaura o estado interno e parâmetros iniciais da voz
-- `setInstrument(instrumentId: int): void` - Modifica o instrumento da voz
-- `setVolume(vol: int): void` - Define o volume local
-- `setOctave(oct: int): void` - Define a oitava da voz, com limites inferior (0) e superior (9)
-- `enqueueNote(note: int, duration: float, volume: int): void` - Adiciona um evento de nota MIDI à fila
-- `enqueueSilence(duration: float): void` - Adiciona um evento de pausa à fila de eventos
-- `getNextEvent(): MidiEvent` - Retorna e remove o próximo evento MIDI da fila
-- `hasEvents(): bool` - Verifica se há eventos pendentes na fila de reprodução
+- ```cpp reset(baseInstrument: int, baseVolume: int, baseOctave: int, delay: int): void``` - Restaura o estado interno e parâmetros iniciais da voz
+- ```cpp setInstrument(instrumentId: int): void``` - Modifica o instrumento da voz
+- ```cpp setVolume(vol: int): void``` - Define o volume local
+- ```cpp setOctave(oct: int): void``` - Define a oitava da voz, com limites inferior (0) e superior (9)
+- ```cpp enqueueNote(note: int, duration: float, volume: int): void``` - Adiciona um evento de nota MIDI à fila
+- ```cpp enqueueSilence(duration: float): void``` - Adiciona um evento de pausa à fila de eventos
+- ```cpp getNextEvent(): MidiEvent``` - Retorna e remove o próximo evento MIDI da fila
+- ```cpp hasEvents(): bool``` - Verifica se há eventos pendentes na fila de reprodução
 
 == Classe TokenProcessor
 
 *Atributos:*
-- `mappingRules: std::unordered_map<char, Instruction>` - Dicionário que mapeia caracteres para instruções musicais correspondentes
+- ```cpp mappingRules: std::unordered_map<char, Instruction>``` - Dicionário que mapeia caracteres para instruções musicais correspondentes
 
 *Métodos:*
-- `tokenize(input: string, voices: std::vector<Voice>&): void` - Processa o texto completo de entrada, particionando em linhas e configurando a fila de notas de cada voz
-- `parseLine(line: string, voiceIndex: int, voice: Voice&): void` - Analisa lexicalmente uma linha individual de texto, gerando e enfileirando eventos de música na voz correspondente
-- `parseDelay(line: string): int` - Analisa o prefixo de atraso `[n]` no início da string, retornando o número de tempos de atraso extraído
+- ```cpp tokenize(input: string, voices: std::vector<Voice>&): void``` - Processa o texto completo de entrada, particionando em linhas e configurando a fila de notas de cada voz
+- ```cpp parseLine(line: string, voiceIndex: int, voice: Voice&): void``` - Analisa lexicalmente uma linha individual de texto, gerando e enfileirando eventos de música na voz correspondente
+- ```cpp parseDelay(line: string): int``` - Analisa o prefixo de atraso (```cpp [n]```) no início da string, retornando o número de tempos de atraso extraído
 
 == Classe MusicMachine
 
 *Atributos:*
-- `voices: std::vector<Voice>` - Vetor contendo a lista de vozes polifônicas gerenciadas
-- `globalBPM: int` - Armazena o andamento global em batidas por minuto (BPM)
-- `tokenProcessor: TokenProcessor` - Referência para a classe de interpretação de texto
-- `audioEngine: AudioEngine` - Referência para a classe gerenciadora do motor de síntese
+- ```cpp voices: std::vector<Voice>``` - Vetor contendo a lista de vozes polifônicas gerenciadas
+- ```cpp globalBPM: int``` - Armazena o andamento global em batidas por minuto (BPM)
+- ```cpp tokenProcessor: TokenProcessor``` - Referência para a classe de interpretação de texto
+- ```cpp audioEngine: AudioEngine``` - Referência para a classe gerenciadora do motor de síntese
 
 *Métodos:*
-- `initialize(text: string): void` - Prepara a máquina para reprodução realizando o parsing do texto e inicializando as vozes
-- `play(): void` - Inicia a reprodução polifônica concorrente de todas as vozes
-- `pause(): void` - Pausa temporariamente a execução global
-- `stop(): void` - Finaliza a reprodução e reseta o cursor de eventos
-- `setBPM(bpm: int): void` - Define o BPM global inicial
-- `adjustBPM(delta: int): void` - Ajusta o BPM global dinamicamente durante a reprodução
-- `exportToMidi(filepath: string): bool` - Exporta a sequência de eventos de todas as vozes para um arquivo padrão `.mid`
+- ```cpp initialize(text: string): void``` - Prepara a máquina para reprodução realizando o parsing do texto e inicializando as vozes
+- ```cpp play(): void``` - Inicia a reprodução polifônica concorrente de todas as vozes
+- ```cpp pause(): void``` - Pausa temporariamente a execução global
+- ```cpp stop(): void``` - Finaliza a reprodução e reseta o cursor de eventos
+- ```cpp setBPM(bpm: int): void``` - Define o BPM global inicial
+- ```cpp adjustBPM(delta: int): void``` - Ajusta o BPM global dinamicamente durante a reprodução
+- ```cpp exportToMidi(filepath: string): bool``` - Exporta a sequência de eventos de todas as vozes para um arquivo padrão (```cpp .mid```)
 
 == Classe AudioEngine
 
 *Atributos:*
-- `settings: fluid_settings_t*` - Configurações internas de alocação do sintetizador FluidSynth
-- `synth: fluid_synth_t*` - Instância ativa do gerador de síntese FluidSynth
-- `adriver: fluid_audio_driver_t*` - Driver de saída de áudio de tempo real do sistema operacional
-- `soundfontId: int` - ID identificador do arquivo de SoundFont (`.sf2`) carregado
-- `isPlaying: bool` - Estado atual da síntese sonora
+- ```cpp settings: fluid_settings_t*``` - Configurações internas de alocação do sintetizador FluidSynth
+- ```cpp synth: fluid_synth_t*``` - Instância ativa do gerador de síntese FluidSynth
+- ```cpp adriver: fluid_audio_driver_t*``` - Driver de saída de áudio de tempo real do sistema operacional
+- ```cpp soundfontId: int``` - ID identificador do arquivo de SoundFont (```cpp .sf2```) carregado
+- ```cpp isPlaying: bool``` - Estado atual da síntese sonora
 
 *Métodos:*
-- `initialize(sfPath: string): bool` - Configura o motor, carrega a SoundFont e ativa o driver de som
-- `noteOn(channel: int, key: int, velocity: int): void` - Envia instrução MIDI para tocar nota no sintetizador
-- `noteOff(channel: int, key: int): void` - Envia instrução MIDI para silenciar nota
-- `programChange(channel: int, program: int): void` - Associa um instrumento MIDI ao canal informado
-- `setChannelVolume(channel: int, volume: int): void` - Ajusta o volume do canal de síntese específico
-- `shutdown(): void` - Para a síntese e desaloca recursos de memória de áudio
+- ```cpp initialize(sfPath: string): bool``` - Configura o motor, carrega a SoundFont e ativa o driver de som
+- ```cpp noteOn(channel: int, key: int, velocity: int): void``` - Envia instrução MIDI para tocar nota no sintetizador
+- ```cpp noteOff(channel: int, key: int): void``` - Envia instrução MIDI para silenciar nota
+- ```cpp programChange(channel: int, program: int): void``` - Associa um instrumento MIDI ao canal informado
+- ```cpp setChannelVolume(channel: int, volume: int): void``` - Ajusta o volume do canal de síntese específico
+- ```cpp shutdown(): void``` - Para a síntese e desaloca recursos de memória de áudio
 
 == Classe MidiWriter
 
 *Atributos:*
-- `midiFile: smf::MidiFile` - Instância de controle de escrita de arquivos MIDI polifônicos
+- ```cpp writer_: libremidi::writer``` - Instância de controle de escrita de arquivos MIDI polifônicos
+- ```cpp TICKS_PER_BEAT: int``` - Resolução de tempo (constante, padrão 480 ticks/beat)
 
 *Métodos:*
-- `createFile(): void` - Inicializa as estruturas necessárias para o arquivo MIDI multi-track
-- `writeVoiceTrack(trackIndex: int, voice: Voice): void` - Converte a fila de eventos de uma voz em eventos MIDI e grava em sua trilha dedicada
-- `save(filepath: string): bool` - Salva a estrutura criada em disco no formato binário `.mid`
+- ```cpp createFile(): void``` - Inicializa as estruturas necessárias para o arquivo MIDI multi-track
+- ```cpp writeVoiceTrack(trackIndex: int, voice: Voice): void``` - Converte a fila de eventos de uma voz em eventos MIDI e grava em sua trilha dedicada
+- ```cpp save(filepath: string): bool``` - Salva a estrutura criada em disco no formato binário (```cpp .mid```)
 
 == Classe MainWindow
 
 *Atributos:*
-- `musicMachine: MusicMachine` - Instância da lógica central controladora da máquina
-- `textEditor: QTextEdit*` - Componente visual da interface gráfica de edição de texto
-- `playButton: QPushButton*` - Botão para disparar a execução
-- `pauseButton: QPushButton*` - Botão para pausar a execução
-- `stopButton: QPushButton*` - Botão para parar e resetar o andamento
-- `bpmSpinBox: QSpinBox*` - Seletor numérico para configuração de BPM
-- `exportButton: QPushButton*` - Botão para salvar arquivo de música
-- `fileMenu: QMenu*` - Menu superior de opções de abertura/gravação de arquivos
+- ```cpp musicMachine: MusicMachine``` - Instância da lógica central controladora da máquina
+- ```cpp textEditor: QTextEdit*``` - Componente visual da interface gráfica de edição de texto
+- ```cpp playButton: QPushButton*``` - Botão para disparar a execução
+- ```cpp pauseButton: QPushButton*``` - Botão para pausar a execução
+- ```cpp stopButton: QPushButton*``` - Botão para parar e resetar o andamento
+- ```cpp bpmSpinBox: QSpinBox*``` - Seletor numérico para configuração de BPM
+- ```cpp exportButton: QPushButton*``` - Botão para salvar arquivo de música
+- ```cpp fileMenu: QMenu*``` - Menu superior de opções de abertura/gravação de arquivos
 
 *Métodos:*
-- `setupUI(): void` - Liga e conecta dinamicamente os widgets do arquivo `.ui` às funções slots de controle
-- `onPlayClicked(): void` - Inicializa a reprodução assíncrona
-- `onPauseClicked(): void` - Pausa o thread de áudio
-- `onStopClicked(): void` - Envia comando de interrupção e reinício de canais
-- `onExportClicked(): void` - Solicita caminho de gravação e delega exportação
-- `onOpenFile(): void` - Importa arquivos `.txt` externos para o painel de texto
-- `onSaveFile(): void` - Salva o texto editado pelo painel para disco
+- ```cpp setupUI(): void``` - Liga e conecta dinamicamente os widgets do arquivo (```cpp .ui```) às funções slots de controle
+- ```cpp onPlayClicked(): void``` - Inicializa a reprodução assíncrona
+- ```cpp onPauseClicked(): void``` - Pausa o thread de áudio
+- ```cpp onStopClicked(): void``` - Envia comando de interrupção e reinício de canais
+- ```cpp onExportClicked(): void``` - Solicita caminho de gravação e delega exportação
+- ```cpp onOpenFile(): void``` - Importa arquivos (```cpp .txt```) externos para o painel de texto
+- ```cpp onSaveFile(): void``` - Salva o texto editado pelo painel para disco
 
 = GUI em Qt6
 
-#image("/images/qtmidi.png")
+#image("/images/musicMachine.png")
 
 = Arquitetura do Sistema
 
 O sistema é estruturado em uma arquitetura modular orientada a objetos projetada para suportar a reprodução e processamento de áudio polifônico em tempo real, sem bloquear ou degradar a responsividade da interface com usuário. O design separa estritamente as seguintes responsabilidades:
 
-- *Camada de Apresentação (GUI)*: Representada pela classe `MainWindow`, consome a interface de usuário definida no arquivo `qtmidi.ui` gerado pelo Qt Designer. Esta camada reage a eventos e ações do usuário (carregar/salvar texto, tocar/pausar áudio, configurar parâmetros) e delega as atualizações e disparos para a camada lógica. Toda a manipulação de som e a síntese ocorrem de forma assíncrona (usando threads internas de temporização ou processamento assíncrono), prevenindo o travamento da GUI durante o tempo de execução da reprodução.
+- *Camada de Apresentação (GUI)*: Representada pela classe ```cpp MainWindow```, consome a interface de usuário definida no arquivo ```cpp musicMachine.ui``` gerado pelo Qt Designer visando evitar a definição de interfaces de usuário por código-fonte. Esta camada reage a eventos e ações do usuário (carregar/salvar texto, tocar/pausar áudio, configurar parâmetros) e delega as atualizações e disparos para a camada lógica. Toda a manipulação de som e a síntese ocorrem de forma assíncrona (usando threads internas de temporização ou processamento assíncrono).
 
-- *Camada Lógica Principal*: Coordenada pela classe `MusicMachine`, que orquestra a leitura e execução do processador de texto, controle das vozes polifônicas e sincronismo global. A classe `Voice` encapsula o estado melódico independente de cada trilha de áudio (canal MIDI dedicado, oitava local, volume local, instrumento local e fila de eventos), fornecendo uma representação independente dos dados melódicos das trilhas.
+- *Camada Lógica Principal*: Coordenada pela classe ```cpp MusicMachine```, que orquestra a leitura e execução do processador de texto, controle das vozes polifônicas e sincronismo global. A classe ```cpp Voice``` encapsula o estado melódico independente de cada trilha de áudio (canal MIDI dedicado, oitava local, volume local, instrumento local e fila de eventos), fornecendo uma representação independente dos dados melódicos das trilhas.
 
-- *Camada de Análise Léxica e Semântica*: Implementada pela classe `TokenProcessor`, ela interpreta a entrada textual estruturada em múltiplas linhas. Ela faz o parsing de regras locais (notas A-H, pausas, modulação de oitava/volume/instrumento por caractere) de forma independente para preencher a fila de eventos de cada instância de `Voice`. Ela também reconhece metadados globais (como aceleração de BPM por `>` ou `<`) e inicializações especiais (como o atraso de voz `[n]`).
+- *Camada de Análise Léxica e Semântica*: Implementada pela classe ```cpp TokenProcessor```, ela interpreta a entrada textual estruturada em múltiplas linhas. Também interpreta as regras locais (notas A-H, pausas, modulação de oitava/volume/instrumento por caractere) de forma independente para preencher a fila de eventos de cada instância de ```cpp Voice```. Ela também reconhece metadados globais (como aceleração de BPM por ```cpp >``` ou ```cpp <```) e inicializações especiais (como o atraso de voz ```cpp [n]```).
 
-- *Camada de Síntese e Driver de Áudio*: A classe `AudioEngine` isola a biblioteca externa FluidSynth do restante da lógica da aplicação. Ela realiza a inicialização assíncrona dos buffers, carregamento da SoundFont e despacho de eventos MIDI brutos em canais mapeados para cada voz do sistema. Isso permite que a biblioteca de áudio ou sintetizador físico seja substituído no futuro por outra tecnologia compatível sem que a lógica central da aplicação precise ser reescrita (atendendo ao princípio de Inversão de Dependência).
+- *Camada de Síntese e Driver de Áudio*: A classe ```cpp AudioEngine``` isola a biblioteca externa FluidSynth do restante da lógica da aplicação. Ela realiza a inicialização assíncrona dos buffers, carregamento da SoundFont e despacho de eventos MIDI brutos em canais mapeados para cada voz do sistema. Isso permite que a biblioteca de áudio ou sintetizador físico seja substituído no futuro por outra tecnologia compatível sem que a lógica central da aplicação precise ser reescrita (atendendo ao princípio de Inversão de Dependência).
 
-- *Camada de Exportação*: A classe `MidiWriter` encapsula o empacotamento em formato de trilhas de arquivo MIDI padrão, gravando em disco o resultado estático da interpretação musical.
+- *Camada de Exportação*: A classe ```cpp MidiWriter``` encapsula o empacotamento em formato de trilhas de arquivo MIDI padrão, gravando em disco o resultado estático da interpretação musical.
+
+- *Refinamentos de Implementação*: Durante o desenvolvimento do código-fonte, a classe conceitual ```cpp MusicMachine``` descrita na modelagem foi refinada em ```cpp MidiPlayer``` (responsável exclusiva pela gerência da thread assíncrona de reprodução e controle refinado de tempo) e em ```cpp MainWindow``` (gerenciando a janela gráfica e os slots de interação), garantindo maior coesão de acordo com o Princípio de Responsabilidade Única (SRP). Adicionalmente, o componente de análise conceitual ```cpp TokenProcessor``` foi implementado como a classe ```cpp TextParser```, a qual implementa a interface extensível ```cpp ITextParser``` (promovendo desacoplamento e facilitando a substituição de regras sem alterar as classes consumidoras, em conformidade com o Princípio Aberto/Fechado - OCP).
+
+= Suposições de Projeto
+
+Para o correto funcionamento do sistema e delimitação do escopo técnico na Fase 2, foram estabelecidas as seguintes suposições de projeto:
+
+1. *Disponibilidade de SoundFonts*: O motor de síntese FluidSynth exige um arquivo de SoundFont (```.sf2``` ou ```.sf3```) General MIDI para gerar áudio analógico. Assume-se que o ambiente operacional possui caminhos comuns de bibliotecas de áudio populados (como ```/usr/share/sounds/sf2/FluidR3_GM.sf2``` no Linux). Como contingência, o sistema provê um diálogo interativo de seleção de arquivos (```cpp QFileDialog```) caso nenhuma SoundFont padrão seja encontrada automaticamente, permitindo ao usuário indicar o caminho do arquivo manualmente.
+2. *Reserva do Canal MIDI 9*: Por especificação do protocolo General MIDI, o canal 10 (indexado como 9) é estritamente dedicado a instrumentos de percussão. O sistema desconsidera o canal 9 para evitar problemas de compatibilidade com a sintetização de instrumentos diferentes. Assim, como MIDI 1.0 possui 16 canais, ficamos com 15 restantes, o que é mais do que o suficiente para o escopo desta aplicação. Além disso, não existe uma limitação de 15 'linhas', pois continuamos 're'mapeando linhas acima de 15 de volta para os canais iniciais. $n % 15$, $n$ sendo número de linhas. No entanto, isso significa que mudanças de instrumento e volume em qualquer linha remapeada ao canal serão refletidas em todas as linhas que compartilham aquele canal.
+3. *Restrições de BPM*: As instruções de aceleração (`>`) e desaceleração (`<`) possuem escopo global, como diz a especificação. No entanto, restringimos os valores máximo e mínimo para 1200 e 40, respecivamente, pois foi o valor que uma pesquisa rápida retornou como limites aceitáveis de BPM.
+
+// = Justificativa da Interface Gráfica (GUI)
+// 
+// O design visual da interface gráfica foi elaborado sob a premissa de simplicidade operacional, ergonomia e fácil experimentação por parte do usuário. As decisões de layout justificam-se conforme os seguintes pontos:
+// 
+// 1. *Área de Edição Textual Livre*: O componente principal é um editor de texto amplo (```cpp QTextEdit```), simulando uma partitura digital onde cada linha do texto corresponde diretamente a uma voz da fuga. O usuário tem liberdade de edição, permitindo copiar, colar e modificar facilmente trechos musicais.
+// 2. *Barra de Parâmetros Iniciais*: Posicionada no topo da interface, permite configurar o andamento inicial (BPM) via seletor numérico (```cpp QSpinBox```), selecionar o timbre padrão da voz principal (```cpp QComboBox```) e controlar o volume geral via seletor deslizante (```cpp QSlider```). Isso centraliza as configurações da reprodução em um local visível e de fácil acesso.
+// 3. *Controles de Reprodução Intuitivos (Play/Pause/Stop)*: Posicionados de forma adjacente, os botões oferecem controle imediato sobre o áudio. O botão Play ativa a reprodução assíncrona, alternando seu estado visual para Pause para pausar temporariamente. O botão Stop interrompe a execução, resetando os ponteiros de eventos e forçando o silenciamento imediato de todas as notas ativas nas vozes para sanar problemas de "notas presas" (hanging notes).
+// 4. *Diálogo de Informações (About)*: Um diálogo dedicado (```cpp AboutDialog```) foi projetado via Qt Designer e pode ser aberto a partir do menu "Help > About". Esta janela apresenta detalhes da versão do sistema, dos integrantes do grupo de desenvolvimento e inclui um botão interativo conectado a ```cpp QDesktopServices::openUrl()``` que abre o repositório oficial no navegador padrão do sistema operacional, facilitando o acesso ao código de maneira elegante.
+// 5. *Atalhos do Teclado*: O menu superior "Playback" expõe as opções de controle e foca nos respectivos seletores de andamento e instrumentos ao serem selecionados, otimizando o fluxo de trabalho do usuário avançado.
+
+= Descrição do Procedimento de Teste
+
+A validação de corretude do sistema e do motor de áudio assíncrono abrangeu tanto testes unitários e arquivos de testes estruturados quanto testes de verificação manual do comportamento da interface e concorrência:
+
+== Casos de Teste Automatizados
+
+*Testes Unitários Automatizados*: Implementados no arquivo `tests/test_backend.cpp` com o framework `doctest`, estes testes rodam programaticamente e de forma isolada das dependências físicas do disco. Eles utilizam sequências textuais equivalentes definidas diretamente em memória para validar com precisão matemática os estados internos e o enfileiramento de eventos.
+
+Os testes automatizados cobrem a corretude das seguintes regras e componentes do sistema:
+
+- *Configurações e Limites das Vozes*: Garante que os atributos iniciais das vozes (soprano, contralto, tenor, baixo) correspondam aos padrões definidos e que o mapeamento de canais MIDI respeite a reserva do canal 9 (percussão), roteando as vozes corretas e ciclando adequadamente.
+- *Mapeamento de Notas e Frequências*: Valida a conversão de caracteres de notas (incluindo alterações bemóis como `Eb`, `Ab`, `Mb`) para a escala de pitch MIDI, assegurando que oitavas fora do limite 0-9 sejam tratadas por meio de clamping.
+- *Processamento Lexical e Eventos*: Valida a extração de eventos como notas de repouso (pausa), dinâmicas de volume (espaço duplo), modificações de oitavas (`?`, `.`, `V`), comandos de instrumentos (dígitos, vogais, caracteres `!`, `;`, `,`) e repetição de notas com consoantes.
+- *Polifonia e Sincronismo*: Assegura que o parser lidará corretamente com múltiplas linhas e que a sintaxe de atraso `[n]` gera os tempos corretos de silêncio iniciais para cada voz.
+- *Modificadores Globais*: Testa a aceleração e desaceleração de BPM (`>` e `<`), garantindo o despacho correto do evento de andamento global sincronizado.
+
+== Verificação Manual de Concorrência e Estabilidade
+*Casos de Teste Estruturados (arquivos `.txt`)*: O diretório `tests/` concentra arquivos de texto simples contendo composições de teste padronizadas (como `fuga_bpm.txt`, `fuga_oitavas.txt`, etc.). Esses arquivos são ignorados pela execução automatizada e servem como massa de teste estruturada para validação visual e auditiva manual, sendo carregados e reproduzidos diretamente através da interface gráfica (GUI).
+- *Fuga BWV 847* e *Fuga BWV 578*: Validação do processamento polifônico complexo, garantindo que múltiplas vozes com atrasos de entrada `[n]` rodem concorrentemente sem falhas de sincronia.
+- *Fuga BPM*: Testa o processamento dos modificadores globais de andamento `>` e `<`, garantindo que o BPM do sequenciador seja acelerado e desacelerado de forma homogênea para todas as trilhas ativas.
+- *Fuga Instrumentos*: Valida se modificadores como dígitos e caracteres especiais `!`, `;`, `,`, vogais) resultam nas corretas trocas de canais de instrumentos do sintetizador FluidSynth.
+- *Fuga Pausas*: Valida o comportamento de silenciamento temporário introduzido por caracteres minúsculos `a-h` e outras consoantes.
+- *Fuga Oitavas*: Confirma que os comandos `?`, `V` e `.` alteram as oitavas locais nos limites definidos (0 a 9) e que o estouro superior reinicia à oitava de partida.
+- *Fuga Repetidas*: Valida a semântica de repetição de nota ao encontrar consoantes ou caracteres não mapeados logo após uma nota válida.

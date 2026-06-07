@@ -1,0 +1,14 @@
+# lsan.supp - LeakSanitizer suppressions for external libraries
+# To use: export LSAN_OPTIONS=suppressions=lsan.supp
+
+# Suppress known leaks in Qt 6 Wayland platform plugin
+leak:libQt6WaylandClient
+leak:QtWaylandClient::QWaylandInputDevice
+
+# Suppress leaks in xkbcommon (used by Qt Wayland for keyboard input)
+leak:libxkbcommon
+leak:xkb_compose_
+leak:xkb_context_
+
+# Suppress leaks in SDL3 (used as an audio driver backend by fluidsynth/system)
+leak:libSDL3
