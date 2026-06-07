@@ -6,6 +6,7 @@ set_project("Music_Machine")
 set_version("1.0.0")
 set_languages("cxx26")
 
+add_requires("libiconv", { system = true })
 add_requires("fluidsynth")
 add_requires("libremidi")
 
@@ -14,7 +15,7 @@ if is_mode("debug") then
 end
 
 -- Make xmake output the file for clangd
-add_rules("plugin.compile_commands.autoupdate", {outputdir = "."})
+add_rules("plugin.compile_commands.autoupdate", { outputdir = "." })
 
 -- Enforce warnings as errors globally
 set_warnings("all", "error")
@@ -36,13 +37,13 @@ target("Music_Machine")
     add_files("src/aboutdialog.ui")
 
     -- Compile translation files after building
-    after_build(function (target)
+    after_build( function (target)
         import("detect.sdks.find_qt")
         local qt = find_qt()
         local lrelease
         if qt and qt.bindir then
             local ext = is_plat("windows") and ".exe" or ""
-            local names = {"lrelease6" .. ext, "lrelease" .. ext, "lrelease5" .. ext}
+            local names = { "lrelease6" .. ext, "lrelease" .. ext, "lrelease5" .. ext }
             for _, name in ipairs(names) do
                 local p = path.join(qt.bindir, name)
                 if os.isexec(p) then
@@ -87,20 +88,20 @@ target("Music_Machine")
     -- Release Mode Configuration: High Performance
     if is_mode("release") then
         set_optimize("fastest") -- Automatically maps to -O3 or /O2
-        
+
         -- Compiler-specific flags for fast-math and Link Time Optimization (LTO)
-        add_cxflags("-ffast-math", "-flto", {tools = {"clang", "gcc"}})
-        add_ldflags("-flto", {tools = {"clang", "gcc"}})
-        
-        add_cxflags("/fp:fast", "/GL", {tools = {"cl"}})
-        add_ldflags("/LTCG", {tools = {"cl"}})
+        add_cxflags("-ffast-math", "-flto", { tools = { "clang", "gcc" } })
+        add_ldflags("-flto", { tools = { "clang", "gcc" } })
+
+        add_cxflags("/fp:fast", "/GL", { tools = { "cl" } })
+        add_ldflags("/LTCG", { tools = { "cl" } })
     end
 
     -- Debug Mode Configuration: Memory Inspection
     if is_mode("debug") then
         set_symbols("debug")
         set_optimize("none")
-        
+
         -- Address and Undefined Behavior Sanitizers
         if is_plat("linux", "macosx", "freebsd") then
             add_cxflags("-fsanitize=address,undefined", "-fno-omit-frame-pointer")
@@ -136,27 +137,27 @@ task("build_all_release")
         usage = "xmake build_all_release",
         description = "Compiles the project for Windows, Linux, MacOS, and FreeBSD across x86, ARM, and RISCV."
     })
-    on_run(function ()
+    on_run( function ()
         import("core.base.task")
 
         -- Define the matrix of required platforms and architectures
         local targets = {
-            {os = "linux", arch = "x86_64"},
-            {os = "linux", arch = "arm64"},
-            {os = "linux", arch = "riscv64"},
-            {os = "windows", arch = "x64"},
-            {os = "windows", arch = "arm64"},
-            {os = "macosx", arch = "x86_64"},
-            {os = "macosx", arch = "arm64"},
-            {os = "freebsd", arch = "x86_64"}
+            { os = "linux", arch = "x86_64" },
+            { os = "linux", arch = "arm64" },
+            { os = "linux", arch = "riscv64" },
+            { os = "windows", arch = "x64" },
+            { os = "windows", arch = "arm64" },
+            { os = "macosx", arch = "x86_64" },
+            { os = "macosx", arch = "arm64" },
+            { os = "freebsd", arch = "x86_64" }
         }
 
         for _, tgt in ipairs(targets) do
             print(string.format("Building: %s %s (Release)", tgt.os, tgt.arch))
             -- Configure the environment for the specific target
-            os.execv("xmake", {"f", "-p", tgt.os, "-a", tgt.arch, "-m", "release", "-c"})
+            os.execv("xmake", { "f", "-p", tgt.os, "-a", tgt.arch, "-m", "release", "-c" })
             -- Execute the build
-            os.execv("xmake", {"build"})
+            os.execv("xmake", { "build" })
         end
     end
     )
@@ -167,7 +168,7 @@ task("format")
         usage = "xmake format",
         description = "Runs clang-format over all source and header C++ files."
     })
-    on_run(function ()
+    on_run( function ()
         os.exec("clang-format -i src/*.cpp src/audio/*.cpp src/core/*.cpp src/parsing/*.cpp include/*.h src/*.h tests/*.cpp")
         print("Codebase formatted successfully!")
     end)
@@ -178,7 +179,6 @@ task("lint")
         usage = "xmake lint",
         description = "Runs static analysis using clang-tidy and run_linter.sh."
     })
-    on_run(function ()
+    on_run( function ()
         os.exec("./run_linter.sh")
     end)
-
