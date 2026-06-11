@@ -33,6 +33,8 @@ A `text ➜ MIDI` tracker. Since it's fun to listen to MIDI, we also support `te
 
 
 ### Linux & macOS
+> [!WARNING]
+> MacOS requires Xcode to be installed.
 ```bash
 # Configure XMake to release mode
 xmake f -m release
