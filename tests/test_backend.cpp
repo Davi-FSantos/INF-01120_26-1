@@ -20,51 +20,51 @@ static std::vector<MidiEvent> getEvents(Voice &voice) {
 TEST_CASE("Voice Fugue Defaults") {
     // V0 soprano
     Voice v0(0);
-    CHECK(v0.currentOctave == 6);
-    CHECK(v0.currentVolume == 100);
-    CHECK(v0.currentInstrument == 6);
-    CHECK(v0.channel == 0);
+    CHECK(v0.getCurrentOctave() == 6);
+    CHECK(v0.getCurrentVolume() == 100);
+    CHECK(v0.getCurrentInstrument() == 6);
+    CHECK(v0.getChannel() == 0);
 
     // V1 alto
     Voice v1(1);
-    CHECK(v1.currentOctave == 5);
-    CHECK(v1.currentVolume == 80);
-    CHECK(v1.currentInstrument == 20);
-    CHECK(v1.channel == 1);
+    CHECK(v1.getCurrentOctave() == 5);
+    CHECK(v1.getCurrentVolume() == 80);
+    CHECK(v1.getCurrentInstrument() == 20);
+    CHECK(v1.getChannel() == 1);
 
     // V2 tenor
     Voice v2(2);
-    CHECK(v2.currentOctave == 4);
-    CHECK(v2.currentVolume == 60);
-    CHECK(v2.currentInstrument == 0);
-    CHECK(v2.channel == 2);
+    CHECK(v2.getCurrentOctave() == 4);
+    CHECK(v2.getCurrentVolume() == 60);
+    CHECK(v2.getCurrentInstrument() == 0);
+    CHECK(v2.getChannel() == 2);
 
     // V3 bass
     Voice v3(3);
-    CHECK(v3.currentOctave == 3);
-    CHECK(v3.currentVolume == 40);
-    CHECK(v3.currentInstrument == 70);
-    CHECK(v3.channel == 3);
+    CHECK(v3.getCurrentOctave() == 3);
+    CHECK(v3.getCurrentVolume() == 40);
+    CHECK(v3.getCurrentInstrument() == 70);
+    CHECK(v3.getChannel() == 3);
 
     // V4 cycles to V0 properties
     Voice v4(4);
-    CHECK(v4.currentOctave == 6);
-    CHECK(v4.currentVolume == 100);
-    CHECK(v4.currentInstrument == 6);
-    CHECK(v4.channel == 4);
+    CHECK(v4.getCurrentOctave() == 6);
+    CHECK(v4.getCurrentVolume() == 100);
+    CHECK(v4.getCurrentInstrument() == 6);
+    CHECK(v4.getChannel() == 4);
 
     // Channel mapping checks (skipping percussion channel 9)
     Voice v8(8);
-    CHECK(v8.channel == 8);
+    CHECK(v8.getChannel() == 8);
 
     Voice v9(9);
-    CHECK(v9.channel == 10); // Channel 9 is skipped
+    CHECK(v9.getChannel() == 10); // Channel 9 is skipped
 
     Voice v14(14);
-    CHECK(v14.channel == 15);
+    CHECK(v14.getChannel() == 15);
 
     Voice v15(15);
-    CHECK(v15.channel == 0); // Wraps around
+    CHECK(v15.getChannel() == 0); // Wraps around
 }
 
 TEST_CASE("Voice noteToMidiPitch") {
@@ -284,8 +284,8 @@ TEST_CASE("TextParser - Consonants and Repetition") {
     SUBCASE("Consonant after rest behaves as silence") {
         auto voices = parser.parse("aX", 120); // Rest 'a', then consonant X.
         auto events = getEvents(voices[0]);
-        REQUIRE(events.size() == 1);         // Only initial ProgramChange
-        CHECK(voices[0].currentBeat == 2.0); // Rest is 1.0, X is 1.0.
+        REQUIRE(events.size() == 1);              // Only initial ProgramChange
+        CHECK(voices[0].getCurrentBeat() == 2.0); // Rest is 1.0, X is 1.0.
     }
 }
 
