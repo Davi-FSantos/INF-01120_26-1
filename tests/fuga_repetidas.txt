@@ -1,0 +1,2 @@
+[0] C D E F X Y Z G A B
+[4] G A H C D X Y Z E F
