@@ -9,6 +9,7 @@
 #include <QMenu>
 #include "src/audio/AudioEngine.h"
 #include "src/audio/MidiPlayer.h"
+#include "src/core/IMusicFileService.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -20,7 +21,7 @@ class MusicMachine : public QMainWindow {
     Q_OBJECT
 
     public:
-    explicit MusicMachine(QWidget *parent = nullptr);
+    explicit MusicMachine(QWidget *parent = nullptr, std::unique_ptr<IMusicFileService> fileService = nullptr);
     ~MusicMachine() override;
 
     protected:
@@ -44,11 +45,13 @@ class MusicMachine : public QMainWindow {
     [[nodiscard]] QString findSoundFont() const;
     void                  loadLanguage(const QString &locale);
     void                  populateLanguageMenu();
+    QString               getFileDialogPath(bool saveMode, const QString &title, const QString &filter);
 
-    Ui::MusicMachine            *ui;
-    std::unique_ptr<AudioEngine> audioEngine_;
-    std::unique_ptr<MidiPlayer>  midiPlayer_;
-    QString                      soundfontPath_;
+    Ui::MusicMachine                  *ui;
+    std::unique_ptr<AudioEngine>       audioEngine_;
+    std::unique_ptr<MidiPlayer>        midiPlayer_;
+    std::unique_ptr<IMusicFileService> fileService_;
+    QString                            soundfontPath_;
 
     std::unique_ptr<QTranslator> currentTranslator_;
     QString                      currentLocale_;
