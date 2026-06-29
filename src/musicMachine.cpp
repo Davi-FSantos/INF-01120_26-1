@@ -140,9 +140,8 @@ void MusicMachine::onResetClicked() {
 QString MusicMachine::getFileDialogPath(bool saveMode, const QString &title, const QString &filter) {
     if (saveMode) {
         return QFileDialog::getSaveFileName(this, title, "", filter);
-    } else {
-        return QFileDialog::getOpenFileName(this, title, "", filter);
     }
+    return QFileDialog::getOpenFileName(this, title, "", filter);
 }
 
 void MusicMachine::onOpenClicked() {

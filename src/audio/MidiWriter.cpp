@@ -13,7 +13,7 @@ namespace {
 
     constexpr unsigned char MIDI_CC_VOLUME = 7;
 
-    constexpr int DEFAULT_FALLBACK_BPM   = 120;
+    constexpr int DEFAULT_FALLBACK_BPM    = 120;
     constexpr int MICROSECONDS_PER_MINUTE = 60000000;
 } // namespace
 
