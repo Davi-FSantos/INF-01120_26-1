@@ -2,6 +2,21 @@
 #include <fstream>
 #include <algorithm>
 
+namespace {
+    constexpr unsigned char MIDI_STATUS_NOTE_ON        = 0x90;
+    constexpr unsigned char MIDI_STATUS_NOTE_OFF       = 0x80;
+    constexpr unsigned char MIDI_STATUS_PROGRAM_CHANGE = 0xC0;
+    constexpr unsigned char MIDI_STATUS_CONTROL_CHANGE = 0xB0;
+
+    constexpr unsigned char MIDI_CHANNEL_MASK = 0x0F;
+    constexpr unsigned char MIDI_VALUE_MASK   = 0x7F;
+
+    constexpr unsigned char MIDI_CC_VOLUME = 7;
+
+    constexpr int DEFAULT_FALLBACK_BPM    = 120;
+    constexpr int MICROSECONDS_PER_MINUTE = 60000000;
+} // namespace
+
 MidiWriter::MidiWriter() {
     createFile();
 }
@@ -30,37 +45,37 @@ void MidiWriter::writeVoiceTrack(int trackIndex, Voice voice) {
         switch (event.type) {
             case MidiEventType::NoteOn:
                 msg = {
-                    static_cast<unsigned char>(0x90 | (event.channel & 0x0F)),
-                    static_cast<unsigned char>(event.pitch & 0x7F),
-                    static_cast<unsigned char>(event.velocity & 0x7F)};
+                    static_cast<unsigned char>(MIDI_STATUS_NOTE_ON | (event.channel & MIDI_CHANNEL_MASK)),
+                    static_cast<unsigned char>(event.pitch & MIDI_VALUE_MASK),
+                    static_cast<unsigned char>(event.velocity & MIDI_VALUE_MASK)};
                 writer_.add_event(tick, trackIndex, msg);
                 break;
             case MidiEventType::NoteOff:
                 msg = {
-                    static_cast<unsigned char>(0x80 | (event.channel & 0x0F)),
-                    static_cast<unsigned char>(event.pitch & 0x7F),
+                    static_cast<unsigned char>(MIDI_STATUS_NOTE_OFF | (event.channel & MIDI_CHANNEL_MASK)),
+                    static_cast<unsigned char>(event.pitch & MIDI_VALUE_MASK),
                     static_cast<unsigned char>(0)};
                 writer_.add_event(tick, trackIndex, msg);
                 break;
             case MidiEventType::ProgramChange:
                 msg = {
-                    static_cast<unsigned char>(0xC0 | (event.channel & 0x0F)),
-                    static_cast<unsigned char>(event.value & 0x7F)};
+                    static_cast<unsigned char>(MIDI_STATUS_PROGRAM_CHANGE | (event.channel & MIDI_CHANNEL_MASK)),
+                    static_cast<unsigned char>(event.value & MIDI_VALUE_MASK)};
                 writer_.add_event(tick, trackIndex, msg);
                 break;
             case MidiEventType::VolumeChange:
                 msg = {
-                    static_cast<unsigned char>(0xB0 | (event.channel & 0x0F)),
-                    7, // Controller #7 is volume
-                    static_cast<unsigned char>(event.value & 0x7F)};
+                    static_cast<unsigned char>(MIDI_STATUS_CONTROL_CHANGE | (event.channel & MIDI_CHANNEL_MASK)),
+                    MIDI_CC_VOLUME,
+                    static_cast<unsigned char>(event.value & MIDI_VALUE_MASK)};
                 writer_.add_event(tick, trackIndex, msg);
                 break;
             case MidiEventType::BpmChange: {
                 int bpm = event.value;
                 if (bpm <= 0) {
-                    bpm = 120;
+                    bpm = DEFAULT_FALLBACK_BPM;
                 }
-                int mpqn = 60000000 / bpm;
+                int mpqn = MICROSECONDS_PER_MINUTE / bpm;
                 msg      = libremidi::meta_events::tempo(mpqn);
                 writer_.add_event(tick, trackIndex, msg);
                 break;

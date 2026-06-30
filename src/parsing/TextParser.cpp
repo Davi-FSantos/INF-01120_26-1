@@ -5,13 +5,8 @@
 #include <string_view>
 
 namespace {
-    constexpr int MAX_VOLUME     = 127;
-    constexpr int MAX_OCTAVE     = 9;
-    constexpr int MIN_OCTAVE     = 0;
-    constexpr int BPM_STEP       = 10;
-    constexpr int DEFAULT_OCTAVE = 6;
+    constexpr int BPM_STEP = 10;
 
-    // constexpr int GM_BANDONEON = 24; // Used in Phase 1 for '!'; overridden by Harmonica (GM 22) in Phase 2
     constexpr int GM_HARMONICA     = 22;
     constexpr int GM_TUBULAR_BELLS = 15;
     constexpr int GM_CHURCH_ORGAN  = 20;
@@ -30,28 +25,6 @@ namespace {
         }
         constexpr std::string_view notes = "abcdefgh";
         return !notes.contains(character);
-    }
-
-    void emitProgramChange(Voice &voice, int instrument) {
-        voice.currentInstrument = instrument;
-        MidiEvent programChange{};
-        programChange.type      = MidiEventType::ProgramChange;
-        programChange.value     = instrument;
-        programChange.timestamp = voice.currentBeat;
-        voice.enqueueEvent(programChange);
-    }
-
-    void emitVolumeChange(Voice &voice) {
-        MidiEvent volumeChange{};
-        volumeChange.type      = MidiEventType::VolumeChange;
-        volumeChange.value     = voice.currentVolume;
-        volumeChange.timestamp = voice.currentBeat;
-        voice.enqueueEvent(volumeChange);
-    }
-
-    void enqueueRest(Voice &voice) {
-        voice.lastWasNote = false;
-        voice.currentBeat += Voice::DEFAULT_NOTE_DURATION;
     }
 } // namespace
 
@@ -73,17 +46,13 @@ std::vector<Voice> TextParser::parse(const std::string &text, int initialBpm) {
 
         Voice voice(voiceIndex);
         if (voiceIndex == 0) {
-            voice.currentInstrument = defaultInstrument_;
+            voice.setCurrentInstrument(defaultInstrument_);
         }
-        size_t pos            = 0;
-        voice.entryDelayBeats = parseDelay(line, pos);
+        size_t pos = 0;
+        voice.setEntryDelayBeats(parseDelay(line, pos));
 
         // Emit initial ProgramChange for the voice's default instrument
-        MidiEvent programChange{};
-        programChange.type      = MidiEventType::ProgramChange;
-        programChange.value     = voice.currentInstrument;
-        programChange.timestamp = 0.0;
-        voice.enqueueEvent(programChange);
+        voice.emitInitialProgramChange();
 
         for (; pos < line.size(); ++pos) {
             char character = line[pos];
@@ -93,7 +62,7 @@ std::vector<Voice> TextParser::parse(const std::string &text, int initialBpm) {
                 std::string noteStr;
                 noteStr.push_back(character);
                 noteStr.push_back('b');
-                voice.enqueueNote(Voice::noteToMidiPitch(noteStr, voice.currentOctave));
+                voice.enqueueNote(noteStr);
                 ++pos; // skip 'b'
                 continue;
             }
@@ -163,9 +132,9 @@ void TextParser::processCharacter(char character, Voice &voice) const {
     if (std::isdigit(static_cast<unsigned char>(character)) != 0) {
         int digit = character - '0';
         if (digit % 2 == 0) {
-            emitProgramChange(voice, voice.currentInstrument + digit);
+            voice.changeInstrument(voice.getCurrentInstrument() + digit);
         } else {
-            emitProgramChange(voice, GM_TUBULAR_BELLS);
+            voice.changeInstrument(GM_TUBULAR_BELLS);
         }
         return;
     }
@@ -179,17 +148,13 @@ void TextParser::processCharacter(char character, Voice &voice) const {
 
     // Other vowels (O, I, U — not A, E which are notes; case-insensitive)
     if (isVowelOIU(character)) {
-        emitProgramChange(voice, GM_BAGPIPES);
+        voice.changeInstrument(GM_BAGPIPES);
         return;
     }
 
     // Other consonants (not A-H): repeat last note or rest
     if (isConsonantNotNote(character)) {
-        if (voice.lastWasNote && voice.lastNotePitch >= 0) {
-            voice.enqueueNote(voice.lastNotePitch);
-        } else {
-            enqueueRest(voice);
-        }
+        voice.repeatLastNoteOrRest();
         return;
     }
 }
@@ -198,35 +163,30 @@ void TextParser::buildRules() {
     // Uppercase A-H: notes
     for (char ch = 'A'; ch <= 'H'; ++ch) {
         charRules_[ch] = [ch](Voice &voice) {
-            voice.enqueueNote(Voice::noteToMidiPitch(ch, voice.currentOctave));
+            voice.enqueueNote(ch);
         };
     }
 
     // Lowercase a-h: rests
     for (char ch = 'a'; ch <= 'h'; ++ch) {
         charRules_[ch] = [](Voice &voice) {
-            enqueueRest(voice);
+            voice.enqueueRest();
         };
     }
 
-    // Space: double volume (capped at 127)
+    // Space: double volume
     charRules_[' '] = [](Voice &voice) {
-        voice.currentVolume = std::min(MAX_VOLUME, voice.currentVolume * 2);
-        emitVolumeChange(voice);
+        voice.doubleVolume();
     };
 
     // ! : Harmonica (GM 22)
     charRules_['!'] = [](Voice &voice) {
-        emitProgramChange(voice, GM_HARMONICA);
+        voice.changeInstrument(GM_HARMONICA);
     };
 
     // ? : increase octave; if already max, reset to default
     charRules_['?'] = [](Voice &voice) {
-        if (voice.currentOctave < MAX_OCTAVE) {
-            ++voice.currentOctave;
-        } else {
-            voice.currentOctave = DEFAULT_OCTAVE;
-        }
+        voice.incrementOctaveOrReset();
     };
 
     // . (dot): same behavior as ? per Phase 1 spec
@@ -234,26 +194,22 @@ void TextParser::buildRules() {
 
     // ; : Tubular Bells (GM 15)
     charRules_[';'] = [](Voice &voice) {
-        emitProgramChange(voice, GM_TUBULAR_BELLS);
+        voice.changeInstrument(GM_TUBULAR_BELLS);
     };
 
-    // , : Church Organ (GM 20) — Phase 2 overrides Phase 1's Agogo
+    // , : Church Organ (GM 20)
     charRules_[','] = [](Voice &voice) {
-        emitProgramChange(voice, GM_CHURCH_ORGAN);
+        voice.changeInstrument(GM_CHURCH_ORGAN);
     };
 
-    // V : decrease octave (Phase 2 addition)
+    // V : decrease octave
     charRules_['V'] = [](Voice &voice) {
-        if (voice.currentOctave > MIN_OCTAVE) {
-            --voice.currentOctave;
-        }
+        voice.decrementOctave();
     };
 
-    // Newline: Seashore (GM 123)
-    // In Phase 2, newlines separate voices so this is mostly for
-    // edge cases where NL appears as a char within a voice context.
+    // Newline: Seashore (GM 122)
     charRules_['\n'] = [](Voice &voice) {
-        emitProgramChange(voice, GM_SEASHORE);
+        voice.changeInstrument(GM_SEASHORE);
     };
 }
 

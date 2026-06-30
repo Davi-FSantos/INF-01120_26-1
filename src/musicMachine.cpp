@@ -3,6 +3,7 @@
 #include "src/parsing/TextParser.h"
 #include "aboutdialog.h"
 #include "src/audio/MidiWriter.h"
+#include "src/core/MusicFileService.h"
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QFile>
@@ -15,7 +16,11 @@
 #include <QCoreApplication>
 #include <cstdlib>
 
-MusicMachine::MusicMachine(QWidget *parent) : QMainWindow(parent), ui(new Ui::MusicMachine), audioEngine_(std::make_unique<AudioEngine>()), midiPlayer_(std::make_unique<MidiPlayer>()) {
+MusicMachine::MusicMachine(QWidget *parent, std::unique_ptr<IMusicFileService> fileService) : QMainWindow(parent),
+                                                                                              ui(new Ui::MusicMachine),
+                                                                                              audioEngine_(std::make_unique<AudioEngine>()),
+                                                                                              midiPlayer_(std::make_unique<MidiPlayer>()),
+                                                                                              fileService_(fileService ? std::move(fileService) : std::make_unique<MusicFileService>()) {
     ui->setupUi(this);
 
     // Initialize player
@@ -132,43 +137,47 @@ void MusicMachine::onResetClicked() {
     midiPlayer_->stop();
 }
 
+QString MusicMachine::getFileDialogPath(bool saveMode, const QString &title, const QString &filter) {
+    if (saveMode) {
+        return QFileDialog::getSaveFileName(this, title, "", filter);
+    }
+    return QFileDialog::getOpenFileName(this, title, "", filter);
+}
+
 void MusicMachine::onOpenClicked() {
-    QString path = QFileDialog::getOpenFileName(this, tr("Open Music Sequence"), "", tr("Text Files (*.txt);;All Files (*)"));
+    QString path = getFileDialogPath(false, tr("Open Music Sequence"), tr("Text Files (*.txt);;All Files (*)"));
     if (path.isEmpty()) {
         return;
     }
 
     midiPlayer_->stop();
 
-    QFile file(path);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QMessageBox::critical(this, tr("Error"), tr("Could not open file for reading."));
+    bool    success = false;
+    QString errorMessage;
+    QString content = fileService_->readTextFile(path, success, errorMessage);
+    if (!success) {
+        QMessageBox::critical(this, tr("Error"), errorMessage);
         return;
     }
 
-    QTextStream in(&file);
-    ui->plainTextEdit->setPlainText(in.readAll());
+    ui->plainTextEdit->setPlainText(content);
 }
 
 void MusicMachine::onSaveClicked() {
-    QString path = QFileDialog::getSaveFileName(this, tr("Save Music Sequence"), "", tr("Text Files (*.txt);;All Files (*)"));
+    QString path = getFileDialogPath(true, tr("Save Music Sequence"), tr("Text Files (*.txt);;All Files (*)"));
     if (path.isEmpty()) {
         return;
     }
 
-    QFile file(path);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        QMessageBox::critical(this, tr("Error"), tr("Could not open file for writing."));
+    QString errorMessage;
+    if (!fileService_->writeTextFile(path, ui->plainTextEdit->toPlainText(), errorMessage)) {
+        QMessageBox::critical(this, tr("Error"), errorMessage);
         return;
     }
-
-    QTextStream out(&file);
-    out << ui->plainTextEdit->toPlainText();
 }
 
 void MusicMachine::onExportMidiClicked() {
-    QString path = QFileDialog::getSaveFileName(
-        this, tr("Export MIDI File"), "", tr("MIDI Files (*.mid);;All Files (*)"));
+    QString path = getFileDialogPath(true, tr("Export MIDI File"), tr("MIDI Files (*.mid);;All Files (*)"));
     if (path.isEmpty()) {
         return;
     }
@@ -179,22 +188,14 @@ void MusicMachine::onExportMidiClicked() {
         return;
     }
 
-    int bpm = ui->spinBox_2->value();
+    int     bpm               = ui->spinBox_2->value();
+    int     defaultInstrument = ui->comboBox->currentIndex();
+    QString errorMessage;
 
-    TextParser parser;
-    parser.setDefaultInstrument(ui->comboBox->currentIndex());
-    std::vector<Voice> voices = parser.parse(text, bpm);
-
-    MidiWriter writer;
-    writer.createFile();
-    for (size_t i = 0; i < voices.size(); ++i) {
-        writer.writeVoiceTrack(static_cast<int>(i), voices[i]);
-    }
-
-    if (writer.save(path.toStdString())) {
+    if (fileService_->exportMidiFile(path, text, bpm, defaultInstrument, errorMessage)) {
         QMessageBox::information(this, tr("Success"), tr("MIDI file exported successfully."));
     } else {
-        QMessageBox::critical(this, tr("Error"), tr("Failed to save the MIDI file."));
+        QMessageBox::critical(this, tr("Error"), errorMessage);
     }
 }
 

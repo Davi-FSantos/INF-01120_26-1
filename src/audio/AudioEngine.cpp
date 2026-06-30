@@ -1,6 +1,10 @@
 #include "AudioEngine.h"
 #include <stdexcept>
 
+namespace {
+    constexpr int MIDI_CC_VOLUME = 7;
+} // namespace
+
 AudioEngine::AudioEngine() = default;
 
 AudioEngine::~AudioEngine() {
@@ -46,7 +50,7 @@ void AudioEngine::noteOff(int channel, int key) {
     fluid_synth_noteoff(synth_, channel, key);
 }
 void AudioEngine::setChannelVolume(int channel, int volume) {
-    fluid_synth_cc(synth_, channel, 7, volume);
+    fluid_synth_cc(synth_, channel, MIDI_CC_VOLUME, volume);
 }
 void AudioEngine::shutdown() {
     if (adriver_) {
