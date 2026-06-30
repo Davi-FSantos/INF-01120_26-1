@@ -1,0 +1,205 @@
+@startuml
+
+class MusicMachine {
+    - ui : Ui::MusicMachine*
+    - audioEngine_ : std::unique_ptr<AudioEngine>
+    - midiPlayer_ : std::unique_ptr<MidiPlayer>
+    - fileService_ : std::unique_ptr<IMusicFileService>
+    - soundfontPath_ : QString
+    - currentTranslator_ : std::unique_ptr<QTranslator>
+    - currentLocale_ : QString
+    - languageMenu_ : QMenu*
+    + MusicMachine(parent : QWidget*, fileService : std::unique_ptr<IMusicFileService>)
+    + ~MusicMachine()
+    - onPlayClicked() : void
+    - onResetClicked() : void
+    - onOpenClicked() : void
+    - onSaveClicked() : void
+    - onExportMidiClicked() : void
+    - onAboutTriggered() : void
+    - onPlaybackFinished() : void
+    - onPlaybackStarted() : void
+    - onPlaybackStopped() : void
+    - onInstrumentChanged(index : int) : void
+    - onVolumeChanged(value : int) : void
+    - setupConnections() : void
+    - updatePlaybackUI() : void
+    - findSoundFont() : QString
+    - loadLanguage(locale : const QString&) : void
+    - populateLanguageMenu() : void
+    - getFileDialogPath(saveMode : bool, title : const QString&, filter : const QString&) : QString
+}
+
+class AboutDialog {
+    - ui : Ui::AboutDialog*
+    + AboutDialog(parent : QWidget*)
+    + ~AboutDialog()
+    - onSourceCodeClicked() : void
+}
+
+interface IAudioOutput {
+    + initialize(sfPath : std::string) : bool
+    + noteOn(channel : int, key : int, velocity : int) : void
+    + noteOff(channel : int, key : int) : void
+    + programChange(channel : int, program : int) : void
+    + setChannelVolume(channel : int, volume : int) : void
+    + shutdown() : void
+}
+
+class AudioEngine {
+    - settings_ : fluid_settings_t*
+    - synth_ : fluid_synth_t*
+    - adriver_ : fluid_audio_driver_t*
+    - soundfontId_ : int
+    - isPlaying_ : bool
+    + AudioEngine()
+    + ~AudioEngine()
+    + initialize(sfPath : std::string) : bool
+    + noteOn(channel : int, key : int, velocity : int) : void
+    + noteOff(channel : int, key : int) : void
+    + programChange(channel : int, program : int) : void
+    + setChannelVolume(channel : int, volume : int) : void
+    + shutdown() : void
+}
+
+class MidiPlayer {
+    - audioOutput_ : IAudioOutput*
+    - playbackThread_ : std::thread
+    - isPlaying_ : std::atomic<bool>
+    - isPaused_ : std::atomic<bool>
+    - masterVolume_ : std::atomic<int>
+    - playbackEvents_ : std::vector<PlaybackEvent>
+    - initialBpm_ : int
+    - activeNotes_ : std::set<std::pair<int, int>>
+    - stateMutex_ : std::mutex
+    + MidiPlayer(parent : QObject*)
+    + ~MidiPlayer()
+    + initialize(audioOutput : IAudioOutput*) : void
+    + play(voices : std::vector<Voice>, initialBpm : int) : void
+    + pause() : void
+    + resume() : void
+    + stop() : void
+    + setMasterVolume(volume : int) : void
+    + isPlaying() : bool
+    + isPaused() : bool
+    - playbackLoop() : void
+    - dispatch(event : const MidiEvent&) : void
+}
+
+class Voice {
+    - currentOctave_ : int
+    - currentVolume_ : int
+    - currentInstrument_ : int
+    - entryDelayBeats_ : int
+    - channel_ : int
+    - lastNotePitch_ : int
+    - lastWasNote_ : bool
+    - currentBeat_ : double
+    - eventQueue_ : std::queue<MidiEvent>
+    + Voice(index : int)
+    + applyFugueDefaults(index : int) : void
+    + enqueueNote(pitch : int) : void
+    + enqueueNote(noteName : char) : void
+    + enqueueNote(noteName : const std::string&) : void
+    + enqueueEvent(event : MidiEvent) : void
+    + emitBpmChange(bpm : int) : void
+    + emitInitialProgramChange() : void
+    + changeInstrument(instrument : int) : void
+    + changeVolume(volume : int) : void
+    + doubleVolume() : void
+    + incrementOctaveOrReset() : void
+    + decrementOctave() : void
+    + enqueueRest() : void
+    + repeatLastNoteOrRest() : void
+    + getNextEvent() : std::optional<MidiEvent>
+    + hasEvents() : bool
+    + getCurrentOctave() : int
+    + getCurrentVolume() : int
+    + getCurrentInstrument() : int
+    + getEntryDelayBeats() : int
+    + getChannel() : int
+    + getLastNotePitch() : int
+    + lastWasNote() : bool
+    + getCurrentBeat() : double
+    + setCurrentInstrument(instrument : int) : void
+    + setEntryDelayBeats(delay : int) : void
+}
+
+interface ITextParser {
+    + parse(text : const std::string&, initialBpm : int) : std::vector<Voice>
+}
+
+class TextParser {
+    - charRules_ : std::unordered_map<char, Action>
+    - defaultInstrument_ : int
+    + TextParser()
+    + parse(text : const std::string&, initialBpm : int) : std::vector<Voice>
+    + setDefaultInstrument(instrument : int) : void
+    - buildRules() : void
+    - parseDelay(line : const std::string&, pos : size_t&) : int
+    - processCharacter(c : char, voice : Voice&) : void
+}
+
+interface IMusicFileService {
+    + readTextFile(filePath : const QString&, success : bool&, errorMessage : QString&) : QString
+    + writeTextFile(filePath : const QString&, content : const QString&, errorMessage : QString&) : bool
+    + exportMidiFile(filePath : const QString&, text : const std::string&, initialBpm : int, defaultInstrument : int, errorMessage : QString&) : bool
+}
+
+class MusicFileService {
+    + readTextFile(filePath : const QString&, success : bool&, errorMessage : QString&) : QString
+    + writeTextFile(filePath : const QString&, content : const QString&, errorMessage : QString&) : bool
+    + exportMidiFile(filePath : const QString&, text : const std::string&, initialBpm : int, defaultInstrument : int, errorMessage : QString&) : bool
+}
+
+class MidiWriter {
+    - writer_ : libremidi::writer
+    - {static} TICKS_PER_BEAT : int = 480
+    + MidiWriter()
+    + ~MidiWriter()
+    + createFile() : void
+    + writeVoiceTrack(trackIndex : int, voice : Voice) : void
+    + save(filepath : const std::string&) : bool
+}
+
+struct MidiEvent {
+    + type : MidiEventType
+    + pitch : int
+    + velocity : int
+    + timestamp : double
+    + duration : double
+    + channel : int
+    + value : int
+}
+
+enum MidiEventType {
+    NoteOn
+    NoteOff
+    ProgramChange
+    VolumeChange
+    BpmChange
+}
+
+IAudioOutput <|-- AudioEngine
+ITextParser <|-- TextParser
+IMusicFileService <|-- MusicFileService
+
+MusicMachine *-- AudioEngine : creates/owns
+MusicMachine *-- MidiPlayer : creates/owns
+MusicMachine *-- IMusicFileService : injects/owns
+MusicMachine ..> AboutDialog : creates/opens
+
+MidiPlayer o-- IAudioOutput : references
+MidiPlayer *-- Voice : uses
+MidiPlayer ..> MidiEvent : dispatches
+
+MusicFileService ..> ITextParser : uses
+MusicFileService ..> MidiWriter : creates/uses
+MusicFileService ..> Voice : populates/uses
+
+TextParser ..> Voice : populates
+Voice *-- MidiEvent : queues
+MidiWriter ..> Voice : uses
+MidiEvent +-- MidiEventType
+
+@enduml

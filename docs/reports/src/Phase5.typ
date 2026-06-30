@@ -70,6 +70,10 @@ Para a realização do trabalho, foram estabelecidas as seguintes suposições:
 
 = Definições de Classes
 
+#figure(
+  image("images/RevisedUML.svg")
+)
+
 Abaixo constam as classes que compõem o sistema com seus respectivos atributos encapsulados (visibilidade privada) e métodos públicos após a aplicação das melhorias de design.
 
 // Função auxiliar para padronizar as grades das classes

@@ -1,0 +1,112 @@
+@startuml
+' 16:9 Optimization for Slides
+!pragma ratio 0.5625
+left to right direction
+skinparam dpi 300
+skinparam nodesep 120
+skinparam ranksep 60
+skinparam linetype ortho
+skinparam shadowing false
+
+' Higher font size for slide readability
+skinparam defaultFontSize 24
+skinparam classFontSize 26
+skinparam attributeFontSize 20
+skinparam methodFontSize 20
+
+together {
+    interface IAudioOutput {
+        + initialize(sfPath : string) : bool
+        + noteOn(chan, key, vel) : void
+        + noteOff(chan, key) : void
+        + programChange(chan, prog) : void
+        + setChannelVolume(chan, vol) : void
+        + shutdown() : void
+    }
+
+    class AudioEngine {
+        - soundfontId : int
+        - isPlaying : bool
+        + initialize(sfPath : string) : bool
+        + noteOn(chan, key, vel) : void
+        + noteOff(chan, key) : void
+        + programChange(chan, prog) : void
+        + setChannelVolume(chan, vol) : void
+        + shutdown() : void
+    }
+}
+
+together {
+    class MidiPlayer {
+        - audioOutput : IAudioOutput*
+        - isPlaying : atomic<bool>
+        - isPaused : atomic<bool>
+        + initialize(audioOutput) : void
+        + play(voices, bpm) : void
+        + pause() : void
+        + resume() : void
+        + stop() : void
+        + setMasterVolume(vol) : void
+    }
+
+    class Voice {
+        - instrument : int
+        - volume : int
+        - octave : int
+        - noteQueue : queue<MidiEvent>
+        + reset(inst, vol, oct, delay) : void
+        + enqueueNote(note, dur, vol) : void
+        + getNextEvent() : MidiEvent
+        + hasEvents() : bool
+    }
+}
+
+together {
+    interface ITextParser {
+        + parse(text, bpm) : vector<Voice>
+    }
+
+    class TextParser {
+        - charRules : map<char, Action>
+        + parse(text, bpm) : vector<Voice>
+        - processCharacter(c, voice) : void
+    }
+
+    class MidiWriter {
+        - writer : libremidi::writer
+        + createFile() : void
+        + writeVoiceTrack(index, voice) : void
+        + save(filepath) : bool
+    }
+}
+
+together {
+    struct MidiEvent {
+        + type : MidiEventType
+        + pitch : int
+        + velocity : int
+        + duration : double
+    }
+
+    enum MidiEventType {
+        NoteOn
+        NoteOff
+        ProgramChange
+        VolumeChange
+        BpmChange
+    }
+}
+
+IAudioOutput <|-- AudioEngine
+ITextParser <|-- TextParser
+
+MidiPlayer o-- IAudioOutput : references
+MidiPlayer *-- Voice : uses
+MidiPlayer ..> MidiEvent : dispatches
+
+TextParser ..> Voice : populates
+Voice *-- MidiEvent : queues
+MidiWriter ..> Voice : uses
+MidiEvent +-- MidiEventType
+
+@enduml
