@@ -34,11 +34,13 @@ class MusicMachine : public QMainWindow {
     void onSaveClicked();
     void onExportMidiClicked();
     void onAboutTriggered();
+    void onMappingRulesTriggered();
     void onPlaybackFinished();
     void onPlaybackStarted();
     void onPlaybackStopped();
     void onInstrumentChanged(int index);
     void onVolumeChanged(int value);
+    void onActiveVoiceChanged(int lineIndex);
 
     void                  setupConnections();
     void                  updatePlaybackUI();
@@ -46,6 +48,8 @@ class MusicMachine : public QMainWindow {
     void                  loadLanguage(const QString &locale);
     void                  populateLanguageMenu();
     QString               getFileDialogPath(bool saveMode, const QString &title, const QString &filter);
+    [[nodiscard]] int     getCurrentVoiceIndex() const;
+    [[nodiscard]] int     getChannelForVoice(int voiceIndex) const;
 
     Ui::MusicMachine                  *ui;
     std::unique_ptr<AudioEngine>       audioEngine_;

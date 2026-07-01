@@ -9,7 +9,7 @@ class TextParser : public ITextParser {
     public:
     TextParser();
 
-    std::vector<Voice> parse(const std::string &text, int initialBpm) override;
+    std::vector<Voice> parse(const std::string &text, int initialBpm, const std::vector<VoiceConfig> &voiceConfigs = {}) override;
     void               setDefaultInstrument(int instrument);
 
     private:

@@ -32,7 +32,7 @@ TextParser::TextParser() {
     buildRules();
 }
 
-std::vector<Voice> TextParser::parse(const std::string &text, int initialBpm) {
+std::vector<Voice> TextParser::parse(const std::string &text, int initialBpm, const std::vector<VoiceConfig> &voiceConfigs) {
     std::vector<Voice> voices;
     std::istringstream stream(text);
     std::string        line;
@@ -45,9 +45,20 @@ std::vector<Voice> TextParser::parse(const std::string &text, int initialBpm) {
         }
 
         Voice voice(voiceIndex);
-        if (voiceIndex == 0) {
+        if (voiceIndex < static_cast<int>(voiceConfigs.size())) {
+            const auto &config = voiceConfigs[voiceIndex];
+            if (config.instrument != -1) {
+                voice.setCurrentInstrument(config.instrument);
+            } else if (voiceIndex == 0) {
+                voice.setCurrentInstrument(defaultInstrument_);
+            }
+            if (config.volume != -1) {
+                voice.setCurrentVolume(config.volume);
+            }
+        } else if (voiceIndex == 0) {
             voice.setCurrentInstrument(defaultInstrument_);
         }
+
         size_t pos = 0;
         voice.setEntryDelayBeats(parseDelay(line, pos));
 

@@ -42,6 +42,283 @@ Julio Augusto de Castilhos Borges</translation>
     </message>
 </context>
 <context>
+    <name>MappingRulesDialog</name>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="32"/>
+        <source>Character Mapping Rules</source>
+        <translation>Regras de Mapeamento de Caracteres</translation>
+    </message>
+    <message>
+        <source>Interpreter Character Mapping Rules</source>
+        <translation type="vanished">Regras de Mapeamento de Caracteres do Interpretador</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="96"/>
+        <source>Musical Notes</source>
+        <translation>Notas Musicais</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="126"/>
+        <source>&lt;b&gt;A&lt;/b&gt;</source>
+        <translation>&lt;b&gt;A&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="133"/>
+        <source>Play Note La</source>
+        <translation>Tocar Nota Lá</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="149"/>
+        <source>&lt;b&gt;B&lt;/b&gt;</source>
+        <translation>&lt;b&gt;B&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="156"/>
+        <source>Play Note Si</source>
+        <translation>Tocar Nota Si</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="172"/>
+        <source>&lt;b&gt;C&lt;/b&gt;</source>
+        <translation>&lt;b&gt;C&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="179"/>
+        <source>Play Note Do</source>
+        <translation>Tocar Nota Dó</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="195"/>
+        <source>&lt;b&gt;D&lt;/b&gt;</source>
+        <translation>&lt;b&gt;D&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="202"/>
+        <source>Play Note Re</source>
+        <translation>Tocar Nota Ré</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="218"/>
+        <source>&lt;b&gt;E&lt;/b&gt;</source>
+        <translation>&lt;b&gt;E&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="225"/>
+        <source>Play Note Mi</source>
+        <translation>Tocar Nota Mi</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="241"/>
+        <source>&lt;b&gt;F&lt;/b&gt;</source>
+        <translation>&lt;b&gt;F&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="248"/>
+        <source>Play Note Fa</source>
+        <translation>Tocar Nota Fá</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="264"/>
+        <source>&lt;b&gt;G&lt;/b&gt;</source>
+        <translation>&lt;b&gt;G&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="271"/>
+        <source>Play Note Sol</source>
+        <translation>Tocar Nota Sol</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="287"/>
+        <source>&lt;b&gt;H&lt;/b&gt;</source>
+        <translation>&lt;b&gt;H&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="294"/>
+        <source>Play Note B Flat</source>
+        <translation>Tocar Nota Si Bemol</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="310"/>
+        <source>&lt;b&gt;Mb, Eb&lt;/b&gt;</source>
+        <translation>&lt;b&gt;Mb, Eb&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="317"/>
+        <source>Play Note E Flat</source>
+        <translation>Tocar Nota Mi Bemol</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="333"/>
+        <source>&lt;b&gt;Ab&lt;/b&gt;</source>
+        <translation>&lt;b&gt;Ab&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="340"/>
+        <source>Play Note A Flat</source>
+        <translation>Tocar Nota Lá Bemol</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="353"/>
+        <source>Silence</source>
+        <translation>Silêncio</translation>
+    </message>
+    <message>
+        <source>All lowercase chars except</source>
+        <translation type="vanished">Todas as letras minúsculas exceto</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="390"/>
+        <source>o, i, u</source>
+        <translation>o, i, u</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="403"/>
+        <source>Volume Changes</source>
+        <translation>Alterações de Volume</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="440"/>
+        <source>Double current volume (capped at 127)</source>
+        <translation>Dobrar volume atual (limite de 127)</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="453"/>
+        <source>Switching Instruments</source>
+        <translation>Troca de Instrumentos</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="510"/>
+        <source>Switch to Harmonica (GM #22)</source>
+        <translation>Mudar para Gaita (GM #22)</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="487"/>
+        <source>Switch to Bagpipe (GM #110)</source>
+        <translation>Mudar para Gaita de Foles (GM #110)</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="520"/>
+        <source>Change instrument: New = Current + Digit</source>
+        <translation>Mudar instrumento: Novo = Atual + Dígito</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="582"/>
+        <source>Switch to Tubular Bells (GM #15)</source>
+        <translation>Mudar para Sinos Tubulares (GM #15)</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="477"/>
+        <source>Switch to Church Organ (GM #20)</source>
+        <translation>Mudar para Órgão de Tubos (GM #20)</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="53"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt; font-weight:700;&quot;&gt;Textual Mapping Rules&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt; font-weight:700;&quot;&gt;Regras de Mapeamento Textual&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="383"/>
+        <source>&lt;b&gt;All lowercase chars except&lt;/b&gt;</source>
+        <translation>&lt;b&gt;Todas as letras minúsculas exceto&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="433"/>
+        <source>&lt;b&gt;Space&lt;/b&gt;</source>
+        <translation>&lt;b&gt;Espaço&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="503"/>
+        <source>&lt;b&gt;O, o, I, i, U, u&lt;/b&gt;</source>
+        <translation>&lt;b&gt;O, o, I, i, U, u&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="536"/>
+        <source>&lt;b&gt;,&lt;/b&gt;</source>
+        <translation>&lt;b&gt;,&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="549"/>
+        <source>&lt;b&gt;!&lt;/b&gt;</source>
+        <translation>&lt;b&gt;!&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="562"/>
+        <source>&lt;b&gt;0, 2, 4, 6, 8&lt;/b&gt;</source>
+        <translation>&lt;b&gt;0, 2, 4, 6, 8&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="575"/>
+        <source>&lt;b&gt;1, 3, 5, 7, 9, ;&lt;/b&gt;</source>
+        <translation>&lt;b&gt;1, 3, 5, 7, 9, ;&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="595"/>
+        <source>Octave Changes</source>
+        <translation>Alterações de Oitava</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="625"/>
+        <source>&lt;b&gt;?&lt;/b&gt;, &lt;b&gt;.&lt;/b&gt;</source>
+        <translation>&lt;b&gt;?&lt;/b&gt;, &lt;b&gt;.&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="632"/>
+        <source>Increase octave by 1 (capped at 9, resets to default if exceeded)</source>
+        <translation>Aumentar oitava em 1 (limite de 9, reseta para o padrão se excedido)</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="648"/>
+        <source>&lt;b&gt;V&lt;/b&gt;</source>
+        <translation>&lt;b&gt;V&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="655"/>
+        <source>Decrease octave by 1 (minimum 0)</source>
+        <translation>Diminuir oitava em 1 (mínimo 0)</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="668"/>
+        <source>BPM Changing</source>
+        <translation>Alteração de BPM</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="698"/>
+        <source>&lt;b&gt;&amp;gt;&lt;/b&gt;</source>
+        <translation>&lt;b&gt;&amp;gt;&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="705"/>
+        <source>Increase global BPM by 10</source>
+        <translation>Aumentar BPM global em 10</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="721"/>
+        <source>&lt;b&gt;&amp;lt;&lt;/b&gt;</source>
+        <translation>&lt;b&gt;&amp;lt;&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="728"/>
+        <source>Decrease global BPM by 10</source>
+        <translation>Diminuir BPM global em 10</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="741"/>
+        <source>Default Case</source>
+        <translation>Caso Padrão</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="771"/>
+        <source>&lt;b&gt;Other Consonants + All other unmapped chars&lt;/b&gt;</source>
+        <oldsource>Other Consonants + All other unmapped chars</oldsource>
+        <translation>&lt;b&gt;Outras consoantes + Todos os outros caracteres não mapeados&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location filename="mappingrulesdialog.ui" line="781"/>
+        <source>If the previous character was a note, repeat it; otherwise, play silence.</source>
+        <translation>Se o caractere anterior for uma nota, repeti-la; caso contrário, tocar silêncio.</translation>
+    </message>
+</context>
+<context>
     <name>MusicMachine</name>
     <message>
         <location filename="musicMachine.ui" line="15"/>
@@ -50,7 +327,7 @@ Julio Augusto de Castilhos Borges</translation>
     </message>
     <message>
         <location filename="musicMachine.ui" line="30"/>
-        <location filename="musicMachine.ui" line="838"/>
+        <location filename="musicMachine.ui" line="839"/>
         <source>&amp;Open</source>
         <translation>&amp;Carregar</translation>
     </message>
@@ -61,7 +338,7 @@ Julio Augusto de Castilhos Borges</translation>
     </message>
     <message>
         <location filename="musicMachine.ui" line="46"/>
-        <location filename="musicMachine.ui" line="846"/>
+        <location filename="musicMachine.ui" line="847"/>
         <source>&amp;Save</source>
         <translation>&amp;Salvar</translation>
     </message>
@@ -72,10 +349,10 @@ Julio Augusto de Castilhos Borges</translation>
     </message>
     <message>
         <location filename="musicMachine.ui" line="72"/>
-        <location filename="musicMachine.ui" line="864"/>
-        <location filename="musicMachine.cpp" line="229"/>
-        <location filename="musicMachine.cpp" line="247"/>
-        <location filename="musicMachine.cpp" line="249"/>
+        <location filename="musicMachine.ui" line="865"/>
+        <location filename="musicMachine.cpp" line="278"/>
+        <location filename="musicMachine.cpp" line="296"/>
+        <location filename="musicMachine.cpp" line="298"/>
         <source>Play</source>
         <translation>Tocar</translation>
     </message>
@@ -755,223 +1032,247 @@ Julio Augusto de Castilhos Borges</translation>
         <translation>&amp;Ajuda</translation>
     </message>
     <message>
-        <location filename="musicMachine.ui" line="830"/>
+        <location filename="musicMachine.ui" line="831"/>
         <source>File</source>
         <translation>Arquivo</translation>
     </message>
     <message>
-        <location filename="musicMachine.ui" line="851"/>
+        <location filename="musicMachine.ui" line="852"/>
         <source>.mid</source>
         <translation>.mid</translation>
     </message>
     <message>
-        <location filename="musicMachine.ui" line="856"/>
+        <location filename="musicMachine.ui" line="857"/>
         <source>.txt</source>
         <translation>.txt</translation>
     </message>
     <message>
-        <location filename="musicMachine.ui" line="872"/>
+        <location filename="musicMachine.ui" line="873"/>
         <source>Pau&amp;se</source>
         <translation>Pausa</translation>
     </message>
     <message>
-        <location filename="musicMachine.ui" line="880"/>
+        <location filename="musicMachine.ui" line="881"/>
         <source>&amp;Reset</source>
         <translation>&amp;Resetar</translation>
     </message>
     <message>
-        <location filename="musicMachine.ui" line="888"/>
+        <location filename="musicMachine.ui" line="889"/>
         <source>Change &amp;BPM</source>
         <translation>Mudar &amp;BPM</translation>
     </message>
     <message>
-        <location filename="musicMachine.ui" line="896"/>
+        <location filename="musicMachine.ui" line="897"/>
         <source>&amp;Undo</source>
         <translation>&amp;Desfazer</translation>
     </message>
     <message>
-        <location filename="musicMachine.ui" line="904"/>
+        <location filename="musicMachine.ui" line="905"/>
         <source>&amp;Redo</source>
         <translation>&amp;Refazer</translation>
     </message>
     <message>
-        <location filename="musicMachine.ui" line="912"/>
+        <location filename="musicMachine.ui" line="913"/>
         <source>Cut</source>
         <translation>Recortar</translation>
     </message>
     <message>
-        <location filename="musicMachine.ui" line="920"/>
+        <location filename="musicMachine.ui" line="921"/>
         <source>&amp;Copy</source>
         <translation>&amp;Copiar</translation>
     </message>
     <message>
-        <location filename="musicMachine.ui" line="928"/>
+        <location filename="musicMachine.ui" line="929"/>
         <source>Paste</source>
         <translation>Colar</translation>
     </message>
     <message>
-        <location filename="musicMachine.ui" line="936"/>
+        <location filename="musicMachine.ui" line="937"/>
         <source>&amp;Delete</source>
         <translation>&amp;Deletar</translation>
     </message>
     <message>
-        <location filename="musicMachine.ui" line="944"/>
+        <location filename="musicMachine.ui" line="945"/>
         <source>Select &amp;All</source>
         <translation>Selecionar Tudo</translation>
     </message>
     <message>
-        <location filename="musicMachine.ui" line="952"/>
-        <source>About</source>
-        <translation>Sobre</translation>
+        <location filename="musicMachine.ui" line="953"/>
+        <source>&amp;About</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="musicMachine.ui" line="960"/>
+        <source>About</source>
+        <translation type="vanished">Sobre</translation>
+    </message>
+    <message>
+        <location filename="musicMachine.ui" line="961"/>
         <source>Change &amp;Instrument</source>
         <translation>Mudar Instrumento</translation>
     </message>
     <message>
-        <location filename="musicMachine.ui" line="968"/>
+        <location filename="musicMachine.ui" line="969"/>
         <source>&amp;Language</source>
         <translation>&amp;Idioma</translation>
     </message>
     <message>
-        <location filename="musicMachine.cpp" line="32"/>
+        <location filename="musicMachine.cpp" line="35"/>
         <source>SoundFont Not Found</source>
         <translation>SoundFont não Encontrada</translation>
     </message>
     <message>
-        <location filename="musicMachine.cpp" line="33"/>
+        <location filename="musicMachine.cpp" line="35"/>
         <source>Could not find a standard General MIDI SoundFont (.sf2) on your system.&lt;br&gt;Please select one manually to enable audio playback.</source>
         <translation>Não foi possível encontrar uma SoundFont General MIDI padrão (.sf2) no seu sistema.&lt;br&gt;Por favor, selecione uma manualmente para habilitar a reprodução de áudio.</translation>
     </message>
     <message>
-        <location filename="musicMachine.cpp" line="35"/>
+        <location filename="musicMachine.cpp" line="37"/>
         <source>Select SoundFont</source>
         <translation>Selecionar SoundFont</translation>
     </message>
     <message>
-        <location filename="musicMachine.cpp" line="35"/>
+        <location filename="musicMachine.cpp" line="37"/>
         <source>SoundFonts (*.sf2 *.sf3)</source>
         <translation>SoundFonts (*.sf2 *.sf3)</translation>
     </message>
     <message>
-        <location filename="musicMachine.cpp" line="40"/>
+        <location filename="musicMachine.cpp" line="42"/>
         <source>Initialization Error</source>
         <translation>Erro de Inicialização</translation>
     </message>
     <message>
-        <location filename="musicMachine.cpp" line="41"/>
+        <location filename="musicMachine.cpp" line="42"/>
         <source>Failed to initialize the FluidSynth audio engine with the selected SoundFont.</source>
         <translation>Falha ao inicializar o motor de áudio FluidSynth com a SoundFont selecionada.</translation>
     </message>
     <message>
-        <location filename="musicMachine.cpp" line="47"/>
+        <location filename="musicMachine.cpp" line="49"/>
         <source>Audio Disabled</source>
         <translation>Áudio Desabilitado</translation>
     </message>
     <message>
-        <location filename="musicMachine.cpp" line="48"/>
+        <location filename="musicMachine.cpp" line="49"/>
         <source>No SoundFont loaded. Audio playback will be disabled.</source>
         <translation>Nenhuma SoundFont carregada. A reprodução de áudio será desabilitada.</translation>
     </message>
     <message>
-        <location filename="musicMachine.cpp" line="124"/>
-        <location filename="musicMachine.cpp" line="181"/>
+        <location filename="musicMachine.cpp" line="132"/>
+        <location filename="musicMachine.cpp" line="213"/>
         <source>Empty Sequence</source>
         <translation>Sequência Vazia</translation>
     </message>
     <message>
-        <location filename="musicMachine.cpp" line="125"/>
+        <location filename="musicMachine.cpp" line="132"/>
         <source>Please type a music sequence before playing.</source>
         <translation>Por favor, digite uma sequência de música antes de tocar.</translation>
     </message>
     <message>
-        <location filename="musicMachine.cpp" line="144"/>
+        <location filename="musicMachine.cpp" line="174"/>
         <source>Open Music Sequence</source>
         <translation>Carregar Sequência Musical</translation>
     </message>
     <message>
-        <location filename="musicMachine.cpp" line="144"/>
-        <location filename="musicMachine.cpp" line="160"/>
+        <location filename="musicMachine.cpp" line="174"/>
+        <location filename="musicMachine.cpp" line="193"/>
         <source>Text Files (*.txt);;All Files (*)</source>
         <translation>Arquivos de Texto (*.txt);;Todos os Arquivos (*)</translation>
     </message>
     <message>
-        <location filename="musicMachine.cpp" line="151"/>
-        <location filename="musicMachine.cpp" line="165"/>
-        <location filename="musicMachine.cpp" line="201"/>
+        <location filename="musicMachine.cpp" line="185"/>
+        <location filename="musicMachine.cpp" line="200"/>
+        <location filename="musicMachine.cpp" line="239"/>
         <source>Error</source>
         <translation>Erro</translation>
     </message>
     <message>
-        <location filename="musicMachine.cpp" line="151"/>
         <source>Could not open file for reading.</source>
-        <translation>Não foi possível abrir o arquivo para leitura.</translation>
+        <translation type="vanished">Não foi possível abrir o arquivo para leitura.</translation>
     </message>
     <message>
-        <location filename="musicMachine.cpp" line="160"/>
+        <location filename="musicMachine.cpp" line="193"/>
         <source>Save Music Sequence</source>
         <translation>Salvar Sequência Musical</translation>
     </message>
     <message>
-        <location filename="musicMachine.cpp" line="165"/>
         <source>Could not open file for writing.</source>
-        <translation>Não foi possível abrir o arquivo para escrita.</translation>
+        <translation type="vanished">Não foi possível abrir o arquivo para escrita.</translation>
     </message>
     <message>
-        <location filename="musicMachine.cpp" line="175"/>
+        <location filename="musicMachine.cpp" line="206"/>
         <source>Export MIDI File</source>
         <translation>Exportar Arquivo MIDI</translation>
     </message>
     <message>
-        <location filename="musicMachine.cpp" line="175"/>
+        <location filename="musicMachine.cpp" line="206"/>
         <source>MIDI Files (*.mid);;All Files (*)</source>
         <translation>Arquivos MIDI (*.mid);;Todos os Arquivos (*)</translation>
     </message>
     <message>
-        <location filename="musicMachine.cpp" line="182"/>
+        <location filename="musicMachine.cpp" line="213"/>
         <source>Please type a music sequence before exporting.</source>
         <translation>Por favor, digite uma sequência de música antes de exportar.</translation>
     </message>
     <message>
-        <location filename="musicMachine.cpp" line="199"/>
+        <location filename="musicMachine.cpp" line="237"/>
         <source>Success</source>
         <translation>Sucesso</translation>
     </message>
     <message>
-        <location filename="musicMachine.cpp" line="199"/>
+        <location filename="musicMachine.cpp" line="237"/>
         <source>MIDI file exported successfully.</source>
         <translation>Arquivo MIDI exportado com sucesso.</translation>
     </message>
     <message>
-        <location filename="musicMachine.cpp" line="201"/>
         <source>Failed to save the MIDI file.</source>
-        <translation>Falha ao salvar o arquivo MIDI.</translation>
+        <translation type="vanished">Falha ao salvar o arquivo MIDI.</translation>
     </message>
     <message>
-        <location filename="musicMachine.cpp" line="231"/>
+        <location filename="musicMachine.cpp" line="280"/>
         <source>Resume</source>
         <translation>Retomar</translation>
     </message>
     <message>
-        <location filename="musicMachine.cpp" line="238"/>
+        <location filename="musicMachine.cpp" line="287"/>
         <source>Pause</source>
         <translation>Pausar</translation>
     </message>
     <message>
-        <location filename="musicMachine.cpp" line="329"/>
+        <location filename="musicMachine.cpp" line="468"/>
         <source>English</source>
         <translation>Inglês</translation>
     </message>
     <message>
-        <location filename="musicMachine.cpp" line="422"/>
+        <location filename="musicMachine.cpp" line="563"/>
         <source>Language Load Error</source>
         <translation>Erro de Carregamento de Idioma</translation>
     </message>
     <message>
-        <location filename="musicMachine.cpp" line="423"/>
+        <location filename="musicMachine.cpp" line="563"/>
         <source>Failed to load translation file for %1.</source>
         <translation>Falha ao carregar o arquivo de tradução para %1.</translation>
+    </message>
+    <message>
+        <location filename="musicMachine.ui" line="977"/>
+        <source>&amp;Mapping Rules</source>
+        <translation>Regras de &amp;Mapeamento</translation>
+    </message>
+</context>
+<context>
+    <name>QObject</name>
+    <message>
+        <location filename="core/MusicFileService.cpp" line="12"/>
+        <source>Could not open file for reading.</source>
+        <translation type="unfinished">Não foi possível abrir o arquivo para leitura.</translation>
+    </message>
+    <message>
+        <location filename="core/MusicFileService.cpp" line="24"/>
+        <source>Could not open file for writing.</source>
+        <translation type="unfinished">Não foi possível abrir o arquivo para escrita.</translation>
+    </message>
+    <message>
+        <location filename="core/MusicFileService.cpp" line="45"/>
+        <source>Failed to save the MIDI file.</source>
+        <translation type="unfinished">Falha ao salvar o arquivo MIDI.</translation>
     </message>
 </context>
 </TS>

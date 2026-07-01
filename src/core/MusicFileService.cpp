@@ -30,10 +30,10 @@ bool MusicFileService::writeTextFile(const QString &filePath, const QString &con
     return true;
 }
 
-bool MusicFileService::exportMidiFile(const QString &filePath, const std::string &text, int initialBpm, int defaultInstrument, QString &errorMessage) {
+bool MusicFileService::exportMidiFile(const QString &filePath, const std::string &text, int initialBpm, int defaultInstrument, const std::vector<VoiceConfig> &voiceConfigs, QString &errorMessage) {
     TextParser parser;
     parser.setDefaultInstrument(defaultInstrument);
-    std::vector<Voice> voices = parser.parse(text, initialBpm);
+    std::vector<Voice> voices = parser.parse(text, initialBpm, voiceConfigs);
 
     MidiWriter writer;
     writer.createFile();

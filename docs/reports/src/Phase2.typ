@@ -3,6 +3,8 @@
   height: auto,
 )
 
+#show figure.where(kind: raw): set figure(supplement: [Figura])
+
 #v(1em)
 #align(center, text(size: 2em, weight: "bold")[Relatório de Desenvolvimento - Fase 2])
 #v(1em)

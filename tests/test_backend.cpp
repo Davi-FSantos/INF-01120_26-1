@@ -376,3 +376,20 @@ TEST_CASE("TextParser - Flat Notes (Eb, Ab, Mb)") {
     CHECK(events[7].pitch == 87);
     CHECK(events[7].timestamp == 2.0);
 }
+
+TEST_CASE("TextParser - Voice configurations overrides") {
+    TextParser parser;
+    std::vector<VoiceConfig> configs = {
+        {.instrument = 40, .volume = 110},
+        {.instrument = 24, .volume = 75}
+    };
+    auto voices = parser.parse("C\nD", 120, configs);
+    REQUIRE(voices.size() == 2);
+
+    CHECK(voices[0].getCurrentInstrument() == 40);
+    CHECK(voices[0].getCurrentVolume() == 110);
+
+    CHECK(voices[1].getCurrentInstrument() == 24);
+    CHECK(voices[1].getCurrentVolume() == 75);
+}
+

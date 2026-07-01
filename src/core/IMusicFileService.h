@@ -4,12 +4,14 @@
 #include <QString>
 #include <string>
 
+#include "src/parsing/ITextParser.h"
+
 class IMusicFileService {
     public:
     virtual ~IMusicFileService()                                                                                                                   = default;
     virtual QString readTextFile(const QString &filePath, bool &success, QString &errorMessage)                                                    = 0;
     virtual bool    writeTextFile(const QString &filePath, const QString &content, QString &errorMessage)                                          = 0;
-    virtual bool    exportMidiFile(const QString &filePath, const std::string &text, int initialBpm, int defaultInstrument, QString &errorMessage) = 0;
+    virtual bool    exportMidiFile(const QString &filePath, const std::string &text, int initialBpm, int defaultInstrument, const std::vector<VoiceConfig> &voiceConfigs, QString &errorMessage) = 0;
 };
 
 #endif // IMUSICFILESERVICE_H

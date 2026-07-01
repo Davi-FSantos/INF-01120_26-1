@@ -423,3 +423,4 @@ compile_commands.json
 bin/*
 build/*
 *.7z
+dist/*

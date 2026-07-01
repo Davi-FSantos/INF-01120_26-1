@@ -28,6 +28,7 @@ class MidiPlayer : public QObject {
     void resume();
     void stop();
     void setMasterVolume(int volume);
+    [[nodiscard]] int getMasterVolume() const;
 
     bool isPlaying() const;
     bool isPaused() const;

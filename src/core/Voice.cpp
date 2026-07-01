@@ -245,6 +245,10 @@ void Voice::setCurrentInstrument(int instrument) {
     currentInstrument_ = instrument;
 }
 
+void Voice::setCurrentVolume(int volume) {
+    currentVolume_ = std::clamp(volume, 0, 127);
+}
+
 void Voice::setEntryDelayBeats(int delay) {
     entryDelayBeats_ = delay;
 }

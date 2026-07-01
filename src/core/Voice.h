@@ -43,6 +43,7 @@ class Voice {
 
     // Setters / initializers
     void setCurrentInstrument(int instrument);
+    void setCurrentVolume(int volume);
     void setEntryDelayBeats(int delay);
 
     static constexpr double DEFAULT_NOTE_DURATION = 1.0;

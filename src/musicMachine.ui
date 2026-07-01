@@ -755,7 +755,7 @@
      </layout>
     </item>
     <item>
-     <widget class="QPlainTextEdit" name="plainTextEdit"/>
+     <widget class="VoiceEditor" name="plainTextEdit"/>
     </item>
    </layout>
   </widget>
@@ -819,6 +819,7 @@
     </property>
     <addaction name="actionAbout"/>
     <addaction name="actionLanguage"/>
+    <addaction name="actionMappin_Rules"/>
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menuEdit"/>
@@ -949,7 +950,7 @@
     <iconset theme="QIcon::ThemeIcon::HelpAbout"/>
    </property>
    <property name="text">
-    <string>About</string>
+    <string>&amp;About</string>
    </property>
   </action>
   <action name="actionChange_Instrument">
@@ -968,7 +969,22 @@
     <string>&amp;Language</string>
    </property>
   </action>
+  <action name="actionMappin_Rules">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::ToolsCheckSpelling"/>
+   </property>
+   <property name="text">
+    <string>&amp;Mapping Rules</string>
+   </property>
+  </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>VoiceEditor</class>
+   <extends>QPlainTextEdit</extends>
+   <header>VoiceEditor.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

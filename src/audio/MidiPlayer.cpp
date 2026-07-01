@@ -225,3 +225,7 @@ void MidiPlayer::setMasterVolume(int volume) {
         }
     }
 }
+
+int MidiPlayer::getMasterVolume() const {
+    return masterVolume_.load();
+}

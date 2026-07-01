@@ -2,8 +2,11 @@
 #include "ui_musicMachine.h"
 #include "src/parsing/TextParser.h"
 #include "aboutdialog.h"
+#include "mappingrulesdialog.h"
 #include "src/audio/MidiWriter.h"
 #include "src/core/MusicFileService.h"
+#include "VoiceEditor.h"
+#include <QSignalBlocker>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QFile>
@@ -72,6 +75,7 @@ void MusicMachine::setupConnections() {
     connect(ui->action_mid, &QAction::triggered, this, &MusicMachine::onExportMidiClicked);
     connect(ui->action_txt, &QAction::triggered, this, &MusicMachine::onSaveClicked);
     connect(ui->actionAbout, &QAction::triggered, this, &MusicMachine::onAboutTriggered);
+    connect(ui->actionMappin_Rules, &QAction::triggered, this, &MusicMachine::onMappingRulesTriggered);
 
     // Player Signals
     connect(midiPlayer_.get(), &MidiPlayer::playbackStarted, this, &MusicMachine::onPlaybackStarted);
@@ -92,6 +96,12 @@ void MusicMachine::setupConnections() {
     // Instrument and Volume widget connections
     connect(ui->comboBox, &QComboBox::currentIndexChanged, this, &MusicMachine::onInstrumentChanged);
     connect(ui->spinBox, &QSpinBox::valueChanged, this, &MusicMachine::onVolumeChanged);
+
+    // Sync widgets with active voice line
+    connect(ui->plainTextEdit, &VoiceEditor::activeVoiceChanged, this, &MusicMachine::onActiveVoiceChanged);
+    connect(ui->plainTextEdit, &VoiceEditor::textChanged, this, [this]() {
+        onActiveVoiceChanged(ui->plainTextEdit->textCursor().blockNumber());
+    });
 
     // Playback menu action focus triggers
     connect(ui->actionChange_Instrument, &QAction::triggered, this, [this]() {
@@ -127,7 +137,23 @@ void MusicMachine::onPlayClicked() {
 
         TextParser parser;
         parser.setDefaultInstrument(ui->comboBox->currentIndex());
-        std::vector<Voice> voices = parser.parse(text, bpm);
+
+        std::vector<VoiceConfig> voiceConfigs;
+        QTextDocument *doc = ui->plainTextEdit->document();
+        for (QTextBlock block = doc->begin(); block.isValid(); block = block.next()) {
+            if (block.text().isEmpty()) {
+                continue;
+            }
+            VoiceConfig config;
+            auto *data = dynamic_cast<VoiceUserData*>(block.userData());
+            if (data) {
+                config.instrument = data->instrument;
+                config.volume = data->volume;
+            }
+            voiceConfigs.push_back(config);
+        }
+
+        std::vector<Voice> voices = parser.parse(text, bpm, voiceConfigs);
 
         midiPlayer_->play(voices, bpm);
     }
@@ -192,7 +218,22 @@ void MusicMachine::onExportMidiClicked() {
     int     defaultInstrument = ui->comboBox->currentIndex();
     QString errorMessage;
 
-    if (fileService_->exportMidiFile(path, text, bpm, defaultInstrument, errorMessage)) {
+    std::vector<VoiceConfig> voiceConfigs;
+    QTextDocument *doc = ui->plainTextEdit->document();
+    for (QTextBlock block = doc->begin(); block.isValid(); block = block.next()) {
+        if (block.text().isEmpty()) {
+            continue;
+        }
+        VoiceConfig config;
+        auto *data = dynamic_cast<VoiceUserData*>(block.userData());
+        if (data) {
+            config.instrument = data->instrument;
+            config.volume = data->volume;
+        }
+        voiceConfigs.push_back(config);
+    }
+
+    if (fileService_->exportMidiFile(path, text, bpm, defaultInstrument, voiceConfigs, errorMessage)) {
         QMessageBox::information(this, tr("Success"), tr("MIDI file exported successfully."));
     } else {
         QMessageBox::critical(this, tr("Error"), errorMessage);
@@ -204,15 +245,26 @@ void MusicMachine::onAboutTriggered() {
     dialog.exec();
 }
 
+void MusicMachine::onMappingRulesTriggered() {
+    MappingRulesDialog dialog(this);
+    dialog.exec();
+}
+
 void MusicMachine::onPlaybackStarted() {
+    {
+        QSignalBlocker blocker(ui->spinBox);
+        ui->spinBox->setValue(midiPlayer_->getMasterVolume());
+    }
     updatePlaybackUI();
 }
 
 void MusicMachine::onPlaybackStopped() {
+    onActiveVoiceChanged(ui->plainTextEdit->textCursor().blockNumber());
     updatePlaybackUI();
 }
 
 void MusicMachine::onPlaybackFinished() {
+    onActiveVoiceChanged(ui->plainTextEdit->textCursor().blockNumber());
     updatePlaybackUI();
 }
 
@@ -287,20 +339,110 @@ QString MusicMachine::findSoundFont() const {
 }
 
 void MusicMachine::onInstrumentChanged(int index) {
-    if (audioEngine_) {
-        for (int ch = 0; ch < MIDI_CHANNELS; ++ch) {
-            if (ch == MIDI_DRUM_CHANNEL) {
-                continue;
-            }
-            audioEngine_->programChange(ch, index);
-        }
+    int voiceIdx = getCurrentVoiceIndex();
+    if (voiceIdx == -1) return;
+
+    QTextBlock block = ui->plainTextEdit->textCursor().block();
+    auto *data = dynamic_cast<VoiceUserData*>(block.userData());
+    if (!data) {
+        data = new VoiceUserData();
+        block.setUserData(data);
+    }
+    data->instrument = index;
+
+    int channel = getChannelForVoice(voiceIdx);
+    if (audioEngine_ && channel != -1) {
+        audioEngine_->programChange(channel, index);
     }
 }
 
 void MusicMachine::onVolumeChanged(int value) {
-    if (midiPlayer_) {
+    if (midiPlayer_ && midiPlayer_->isPlaying()) {
         midiPlayer_->setMasterVolume(value);
+        return;
     }
+
+    int voiceIdx = getCurrentVoiceIndex();
+    if (voiceIdx == -1) return;
+
+    QTextBlock block = ui->plainTextEdit->textCursor().block();
+    auto *data = dynamic_cast<VoiceUserData*>(block.userData());
+    if (!data) {
+        data = new VoiceUserData();
+        block.setUserData(data);
+    }
+    data->volume = value;
+
+    int channel = getChannelForVoice(voiceIdx);
+    if (audioEngine_ && channel != -1) {
+        audioEngine_->setChannelVolume(channel, value);
+    }
+}
+
+void MusicMachine::onActiveVoiceChanged(int lineIndex) {
+    QTextBlock currentBlock = ui->plainTextEdit->document()->findBlockByNumber(lineIndex);
+    if (!currentBlock.isValid()) {
+        return;
+    }
+
+    int voiceIdx = 0;
+    int tempIdx = 0;
+    QTextDocument *doc = ui->plainTextEdit->document();
+    for (QTextBlock b = doc->begin(); b.isValid(); b = b.next()) {
+        if (b == currentBlock) {
+            voiceIdx = tempIdx;
+            break;
+        }
+        if (!b.text().isEmpty()) {
+            tempIdx++;
+        }
+    }
+
+    int instrument = -1;
+    int volume = -1;
+    auto *data = dynamic_cast<VoiceUserData*>(currentBlock.userData());
+    if (data) {
+        instrument = data->instrument;
+        volume = data->volume;
+    }
+
+    if (instrument == -1) {
+        constexpr std::array<int, 4> GM_INSTRUMENTS = {6, 20, 0, 70};
+        instrument = GM_INSTRUMENTS[voiceIdx % 4];
+    }
+    if (volume == -1) {
+        constexpr std::array<int, 4> BASE_VOLUMES   = {100, 80, 60, 40};
+        volume = BASE_VOLUMES[voiceIdx % 4];
+    }
+
+    QSignalBlocker blocker1(ui->comboBox);
+    ui->comboBox->setCurrentIndex(instrument);
+
+    if (midiPlayer_ && !midiPlayer_->isPlaying()) {
+        QSignalBlocker blocker2(ui->spinBox);
+        ui->spinBox->setValue(volume);
+    }
+}
+
+int MusicMachine::getCurrentVoiceIndex() const {
+    QTextBlock currentBlock = ui->plainTextEdit->textCursor().block();
+    if (!currentBlock.isValid()) {
+        return -1;
+    }
+    int voiceIndex = 0;
+    QTextDocument *doc = ui->plainTextEdit->document();
+    for (QTextBlock block = doc->begin(); block.isValid() && block != currentBlock; block = block.next()) {
+        if (!block.text().isEmpty()) {
+            voiceIndex++;
+        }
+    }
+    return voiceIndex;
+}
+
+int MusicMachine::getChannelForVoice(int voiceIndex) const {
+    if (voiceIndex < 0) return -1;
+    int channelCandidate = voiceIndex % 15;
+    return (channelCandidate >= 9) ? (channelCandidate + 1) : channelCandidate;
 }
 
 void MusicMachine::changeEvent(QEvent *event) {
